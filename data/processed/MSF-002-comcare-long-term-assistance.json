@@ -1,0 +1,68 @@
+{
+  "service_id": "MSF-002",
+  "service_name": "ComCare Long-Term Assistance (Public Assistance)",
+  "agency": "MSF",
+  "location_type": "Physical_OTH",
+  "rich_description": "ComCare Long-Term Assistance, sometimes called PA-LTA or Public Assistance, is the permanent monthly cash payout for low-income Singaporeans who cannot work and have no family who can reasonably support them, typically because of old age, severe disability, chronic illness, or being a full-time caregiver for someone who needs constant attention. Unlike ComCare Short-to-Medium-Term Assistance, this is not a stopgap for a rough patch; this is the long-term floor for people whose situation is not expected to improve. Recipients usually also get CHAS Blue medical subsidies, S&CC rebates, and may be linked to AIC eldercare or MSF disability services at the same time. If you or someone in your family genuinely cannot work and there is nobody else who can support, this is the right scheme to apply for. Cases are reviewed at least once a year so the help stays appropriate to the family's situation.",
+  "eligibility": {
+    "citizenship": [
+      "citizen",
+      "PR"
+    ],
+    "age_min": 21,
+    "age_max": null,
+    "income_ceiling_monthly_sgd": 700,
+    "employment_status": [
+      "unable_to_work",
+      "unemployed"
+    ],
+    "other_criteria": [
+      "Unable to work due to old age, disability, chronic illness, or full-time caregiving",
+      "Little or no family members able to provide financial support",
+      "Household per capita income below the ComCare LTA ceiling"
+    ]
+  },
+  "required_documents": [
+    {
+      "name": "NRIC",
+      "required_if": null,
+      "notes": "For applicant and all household members"
+    },
+    {
+      "name": "Medical reports or memo",
+      "required_if": "applying due to illness or disability",
+      "notes": "Specialist or polyclinic report describing condition and ability to work"
+    },
+    {
+      "name": "Caregiving evidence",
+      "required_if": "applying as a full-time caregiver",
+      "notes": "GP/specialist letter confirming the person being cared for needs constant attention"
+    },
+    {
+      "name": "Proof of household income",
+      "required_if": null,
+      "notes": "Payslips, CPF contribution history, or income tax statements for all working household members"
+    },
+    {
+      "name": "Bank account passbook or statement",
+      "required_if": null,
+      "notes": "For payout transfer"
+    }
+  ],
+  "oth_location": "Level 1, Social Service Office (Tampines SSO)",
+  "operating_hours": {
+    "mon-thu": "08:30-18:00",
+    "fri": "08:30-17:30",
+    "sat-sun": "closed"
+  },
+  "contact": {
+    "phone": "1800-222-0000",
+    "email": null,
+    "website": "https://www.msf.gov.sg/what-we-do/comcare/Pages/ComCare-Long-Term-Assistance.aspx"
+  },
+  "walk_in_accepted": true,
+  "appointment_required": true,
+  "typical_processing_time": "Initial assessment within 2-4 weeks; ongoing cases reviewed at least annually. PLACEHOLDER income ceiling — verify against current MSF figure before demo.",
+  "last_updated": "2026-05-20",
+  "source_url": "https://www.msf.gov.sg/what-we-do/comcare/Pages/ComCare-Long-Term-Assistance.aspx"
+}

@@ -1,0 +1,74 @@
+{
+  "service_id": "MSF-001",
+  "service_name": "ComCare Short-to-Medium-Term Assistance",
+  "agency": "MSF",
+  "location_type": "Physical_OTH",
+  "rich_description": "ComCare Short-to-Medium-Term Assistance is the main safety-net for Singaporean families and individuals who are temporarily unable to support themselves and need help paying for daily living, rent, utilities, or medical bills. It is meant for people going through tough patches like losing a job, getting retrenched or laid off, falling sick, or having a sudden caregiving burden that stops them from working. Help typically lasts three to six months and can be extended if the situation hasn't improved. A social worker at the Social Service Office reviews each case and may also link the household to job-matching, childcare, or other government schemes at the same time. If you feel like you cannot cope financially anymore or boss say cannot already and you don't know where to start, this is usually the first door to knock on.",
+  "eligibility": {
+    "citizenship": [
+      "citizen",
+      "PR"
+    ],
+    "age_min": 21,
+    "age_max": null,
+    "income_ceiling_monthly_sgd": 1900,
+    "employment_status": [
+      "unemployed",
+      "retrenched",
+      "underemployed",
+      "unable_to_work"
+    ],
+    "other_criteria": [
+      "Household per capita income below the ComCare ceiling",
+      "Little or no family support available"
+    ]
+  },
+  "required_documents": [
+    {
+      "name": "NRIC",
+      "required_if": null,
+      "notes": "For applicant and all household members"
+    },
+    {
+      "name": "Proof of income",
+      "required_if": "currently employed or recently employed",
+      "notes": "Recent payslips, CPF contribution history, or income tax statement"
+    },
+    {
+      "name": "Retrenchment letter",
+      "required_if": "retrenched within last 6 months",
+      "notes": null
+    },
+    {
+      "name": "Medical certificate or memo",
+      "required_if": "unable to work due to illness or caregiving",
+      "notes": null
+    },
+    {
+      "name": "Tenancy agreement or HDB lease",
+      "required_if": "applying for rental assistance",
+      "notes": null
+    },
+    {
+      "name": "Recent utility and household bills",
+      "required_if": null,
+      "notes": "Used to assess monthly expenses"
+    }
+  ],
+  "oth_location": "Level 1, Social Service Office (Tampines SSO)",
+  "operating_hours": {
+    "mon-thu": "08:30-18:00",
+    "fri": "08:30-17:30",
+    "sat-sun": "closed"
+  },
+  "contact": {
+    "phone": "1800-222-0000",
+    "email": null,
+    "website": "https://www.msf.gov.sg/what-we-do/comcare"
+  },
+  "walk_in_accepted": true,
+  "appointment_required": false,
+  "typical_processing_time": "Initial assessment within 2 weeks; emergency interim help can be given on the same day at the SSO.",
+  "last_updated": "2026-05-20",
+  "source_url": "https://www.msf.gov.sg/what-we-do/comcare/Pages/ComCare-Short-to-Medium-Term-Assistance.aspx"
+}

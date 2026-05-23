@@ -1,0 +1,43 @@
+{
+  "service_id": "MSF-006",
+  "service_name": "Baby Bonus Scheme",
+  "agency": "MSF",
+  "rich_description": "The Baby Bonus Scheme gives Singapore citizen parents a one-time Cash Gift of $11,000 for their first or second child and $13,000 for their third child onwards, paid out in instalments over the first 18 months. In parallel, every Singapore citizen child gets a Child Development Account (CDA) — a special savings account — into which the Government deposits a $5,000 First Step Grant automatically at birth, plus dollar-for-dollar matching of subsequent parent contributions up to a cap that scales by birth order ($4,000 first child, $7,000 second, $9,000 third, etc.). CDA funds can be spent at Approved Institutions for childcare, infant care, preschool, healthcare, medical insurance, and assistive devices. The cash component shows up in the parent's bank account; the CDA funds can be used at preschools and clinics directly via the CDA card. Baby Bonus is universal for Singapore citizen newborns regardless of household income, but for low-income families it can be the difference between affording a preschool place and not.",
+  "eligibility": {
+    "citizenship": ["citizen"],
+    "age_min": null,
+    "age_max": null,
+    "income_ceiling_monthly_sgd": null,
+    "employment_status": null,
+    "other_criteria": [
+      "Child must be a Singapore citizen at birth",
+      "At least one parent must be a Singapore citizen at the time of the child's birth",
+      "Parents must be lawfully married (some support pathways exist for unwed mothers — discuss with MSF)",
+      "Universal for citizen newborns regardless of household income"
+    ]
+  },
+  "required_documents": [
+    {"name": "NRIC", "required_if": null, "notes": "For both parents"},
+    {"name": "Child's birth certificate", "required_if": null, "notes": "Application can also be started before birth, with the BC submitted later"},
+    {"name": "Marriage certificate", "required_if": null, "notes": null},
+    {"name": "Bank account details", "required_if": null, "notes": "For Cash Gift disbursement"},
+    {"name": "Selected CDA Trustee Bank account", "required_if": null, "notes": "DBS, OCBC, or UOB"}
+  ],
+  "oth_location": "Apply via the LifeSG app under the Baby Bonus Online portal. ServiceSG counter at Tampines OTH can assist with the application if the family is unfamiliar with the app, and Tampines polyclinic provides Baby Bonus packs at birth.",
+  "operating_hours": {
+    "online": "24/7",
+    "mon-fri": "08:00-17:30 (ServiceSG / polyclinic)",
+    "sat": "08:00-13:00 (ServiceSG, limited)",
+    "sun": "closed"
+  },
+  "contact": {
+    "phone": "1800-253-4117",
+    "email": "contact@msf.gov.sg",
+    "website": "https://www.babybonus.msf.gov.sg"
+  },
+  "walk_in_accepted": true,
+  "appointment_required": false,
+  "typical_processing_time": "Cash Gift first instalment: typically within 7-10 days after eligibility is confirmed. CDA First Step Grant: deposited automatically once the CDA is opened.",
+  "last_updated": "2026-05-20",
+  "source_url": "https://www.babybonus.msf.gov.sg"
+}

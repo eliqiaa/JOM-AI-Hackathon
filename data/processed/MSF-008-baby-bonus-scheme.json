@@ -1,0 +1,45 @@
+{
+  "service_id": "MSF-008",
+  "service_name": "Baby Bonus Scheme (Cash Gift + Child Development Account)",
+  "agency": "MSF (Ministry of Social and Family Development)",
+  "location_type": "Digital_Hotline",
+  "rich_description": "The Baby Bonus Scheme is the main package of support from the Singapore government for parents of a newborn baby, infant, or child up to age 12. It has two components, both administered by the Ministry of Social and Family Development (MSF). First, the Baby Bonus Cash Gift — a series of cash payments made into the parent's designated bank account, starting from soon after birth and continuing in scheduled tranches over the first several years. Second, the Child Development Account (CDA), a special savings account in the child's name where parents' contributions are matched dollar-for-dollar by the government up to a cap that depends on birth order; the CDA is then topped up by additional government deposits at key milestones. CDA savings can be spent at Approved Institutions for child-related expenses such as childcare, kindergarten, healthcare, optical, and assistive technology. Eligibility: the child must be a Singapore citizen (or a citizenship application must be in progress). The parents must be lawfully married. The application is the first government form a new parent typically encounters, and it requires the parent to have a SingPass and to add the newborn to their SingPass / LifeSG account (sometimes called child SingPass linking) before the application can proceed. The whole application — Cash Gift enrolment, choosing a CDA bank, claiming Cash Gift payments, and topping up the CDA — is done online via the Baby Bonus Online portal accessed through LifeSG. There is no MSF Baby Bonus counter at Our Tampines Hub. Parents who are unsure how to set up SingPass, how to add their newborn to their SingPass account, how to navigate LifeSG, or how to complete the Baby Bonus enrolment form should walk in to the ServiceSG Centre at OTH Level 1 — the officers there are trained to assist with the full Baby Bonus journey including SingPass setup and child linking.",
+  "eligibility": {
+    "citizenship": ["citizen", "PR"],
+    "age_min": null,
+    "age_max": null,
+    "income_ceiling_monthly_sgd": null,
+    "employment_status": null,
+    "other_criteria": [
+      "Child must be a Singapore citizen, or have a citizenship application in progress",
+      "Parents must be lawfully married",
+      "Designed for parents of newborns through children up to age 12 (for CDA top-ups)",
+      "Caregiver / parent needs SingPass and must add the child to their SingPass account before applying",
+      "For in-person help with SingPass setup, child SingPass linking, or completing the online Baby Bonus enrolment, walk in to ServiceSG @ OTH Level 1 (SSGC-001)"
+    ]
+  },
+  "required_documents": [
+    {"name": "Parent's NRIC", "required_if": null, "notes": "Of the parent applying"},
+    {"name": "Parent's SingPass", "required_if": null, "notes": "Required to log in to LifeSG / Baby Bonus Online. Officers at ServiceSG @ OTH can help set this up if missing."},
+    {"name": "Child's birth certificate", "required_if": null, "notes": "Digital birth registration is now the norm; the BC is auto-linked to the parent if the birth was registered through LifeSG"},
+    {"name": "Marriage certificate", "required_if": "the parents' marriage was not registered in Singapore", "notes": null},
+    {"name": "CDA bank account selection", "required_if": "opening the CDA", "notes": "Choose one of the participating banks during enrolment"}
+  ],
+  "oth_location": "No MSF Baby Bonus counter at Our Tampines Hub. Apply online via the Baby Bonus Online portal at https://www.babybonus.msf.gov.sg or through the LifeSG app, using SingPass. For in-person help with SingPass, child linking, or completing the online form, walk in to the ServiceSG Centre at OTH Level 1 (see SSGC-001).",
+  "operating_hours": {
+    "online": "24/7 (Baby Bonus Online portal)",
+    "mon-fri": "08:30-17:00 (general MSF hotline 1800-111-2222)",
+    "sat": "closed (hotline)",
+    "sun": "closed (hotline)"
+  },
+  "contact": {
+    "phone": "1800-253-4444",
+    "email": "babybonus@msf.gov.sg",
+    "website": "https://www.babybonus.msf.gov.sg"
+  },
+  "walk_in_accepted": false,
+  "appointment_required": false,
+  "typical_processing_time": "Cash Gift enrolment is immediate online after a successful application; the first Cash Gift payment is typically credited within a few weeks of enrolment. CDA opening with the chosen bank typically takes 1-2 weeks. Subsequent Cash Gift tranches and CDA government top-ups follow the published schedule.",
+  "last_updated": "2026-05-23",
+  "source_url": "https://www.babybonus.msf.gov.sg"
+}

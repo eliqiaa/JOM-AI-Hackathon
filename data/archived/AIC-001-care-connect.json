@@ -1,0 +1,36 @@
+{
+  "service_id": "AIC-001",
+  "service_name": "AIC Care Connect (Eldercare Information & Referral)",
+  "agency": "Agency for Integrated Care",
+  "rich_description": "AIC Care Connect, run by the Agency for Integrated Care, is the entry-point hotline and information service for anyone who suddenly finds themselves needing to arrange care for an elderly parent, a relative recovering from a stroke or hospital discharge, or someone with dementia. The careline staff can walk you through the options: Home Care services like nursing visits, physiotherapy or speech therapy at home, Day Care at a Senior Care Centre, residential care (Nursing Home or Sheltered Home), home medical and home dental visits, and the cash schemes that help pay for them. They also link you to a Care Coordinator if the situation needs more than one service stitched together. If the situation is fresh and overwhelming, this is the right phone number to start with before chasing down individual schemes. Common triggers: post-hospital discharge planning, a parent who can no longer manage alone, a dementia diagnosis, or a sudden caregiving role thrust on a family member.",
+  "eligibility": {
+    "citizenship": ["citizen", "PR", "foreigner"],
+    "age_min": null,
+    "age_max": null,
+    "income_ceiling_monthly_sgd": null,
+    "employment_status": null,
+    "other_criteria": [
+      "Open to anyone seeking eldercare information or referrals",
+      "Downstream subsidies and schemes have their own citizenship/income rules"
+    ]
+  },
+  "required_documents": [
+    {"name": "NRIC", "required_if": "applying for a specific downstream scheme via AIC", "notes": "Information enquiries do not need any documents"}
+  ],
+  "oth_location": "Primarily phone (1800-650-6060) and website. AIC operates Senior Care Centres in HDB heartlands but no confirmed counter at Tampines OTH. PLACEHOLDER — verify if AIC has any in-person presence at OTH; if not, nearest Senior Care Centre is in Tampines HDB blocks.",
+  "operating_hours": {
+    "mon-fri": "08:30-20:30 (careline)",
+    "sat": "08:30-16:00 (careline)",
+    "sun": "closed (careline)"
+  },
+  "contact": {
+    "phone": "1800-650-6060",
+    "email": "enquiries@aic.sg",
+    "website": "https://www.aic.sg"
+  },
+  "walk_in_accepted": false,
+  "appointment_required": false,
+  "typical_processing_time": "Same-day information over the phone. Referral to a Care Coordinator typically within 1-2 working days; provider placement (nursing home, day care, home care) depends on availability and can take 1-6 weeks.",
+  "last_updated": "2026-05-20",
+  "source_url": "https://www.aic.sg/care-services/aic-care-connect"
+}

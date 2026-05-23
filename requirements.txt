@@ -1,0 +1,18 @@
+# Core RAG stack
+chromadb==0.5.23                # vector DB; pin to 0.5.x — 0.4 and 0.6+ have breaking API differences
+openai==1.54.3                  # embeddings + LLM reranker; use 1.x SDK style (client.embeddings.create), NOT legacy openai.Embedding.create
+rank-bm25==0.2.2                # sparse retrieval
+
+# Schema + validation
+pydantic==2.9.2                 # v2 syntax ONLY — model_config, model_dump(), @field_validator
+pydantic-settings==2.6.1        # clean .env loading
+
+# Config
+python-dotenv==1.0.1            # loads OPENAI_API_KEY from .env
+
+# Testing
+pytest==8.3.3
+pytest-cov==5.0.0
+
+# Dev quality-of-life
+ruff==0.7.2                     # linter + formatter

@@ -1,0 +1,38 @@
+{
+  "service_id": "AIC-001",
+  "service_name": "AIC Care Connect (Eldercare Information & Referral)",
+  "agency": "Agency for Integrated Care",
+  "location_type": "Digital_Hotline",
+  "rich_description": "AIC Care Connect, run by the Agency for Integrated Care, is the entry-point hotline and information service for families arranging care for an elderly parent, a relative recovering from a stroke or hospital discharge, or someone with dementia. Strictly for eldercare, frail seniors, and adult caregiving situations — NOT for newborn, infant, or child healthcare matters. The careline staff can walk you through the options: Home Care services such as nursing visits, physiotherapy or speech therapy at home, Day Care at a Senior Care Centre, residential care (Nursing Home or Sheltered Home), home medical and home dental visits, and the cash schemes that help pay for them. They also link you to a Care Coordinator if the situation needs more than one service stitched together. If the situation is fresh and overwhelming, this is the right number to start with before chasing down individual eldercare schemes. Common triggers: post-hospital discharge planning of an elderly relative, an aging parent who can no longer manage alone, a dementia diagnosis, the sudden onset of frailty after a fall, or a family member becoming a caregiver for an older adult.",
+  "eligibility": {
+    "citizenship": ["citizen", "PR", "foreigner"],
+    "age_min": null,
+    "age_max": null,
+    "income_ceiling_monthly_sgd": null,
+    "employment_status": null,
+    "other_criteria": [
+      "Open to anyone seeking eldercare information or referrals",
+      "Downstream subsidies and schemes have their own citizenship/income rules",
+      "For in-person help navigating the AIC website or online forms, walk in to ServiceSG @ OTH Level 1"
+    ]
+  },
+  "required_documents": [
+    {"name": "NRIC", "required_if": "applying for a specific downstream scheme via AIC", "notes": "Information enquiries do not need any documents"}
+  ],
+  "oth_location": "No AIC counter at Our Tampines Hub. Call 1800-650-6060 or visit aic.sg. For in-person help with the online application or SingPass, walk in to the ServiceSG Centre at OTH Level 1 (see SSGC-001).",
+  "operating_hours": {
+    "mon-fri": "08:30-20:30 (careline)",
+    "sat": "08:30-16:00 (careline)",
+    "sun": "closed (careline)"
+  },
+  "contact": {
+    "phone": "1800-650-6060",
+    "email": "enquiries@aic.sg",
+    "website": "https://www.aic.sg"
+  },
+  "walk_in_accepted": false,
+  "appointment_required": false,
+  "typical_processing_time": "Same-day information over the phone. Referral to a Care Coordinator typically within 1-2 working days; provider placement (nursing home, day care, home care) depends on availability and can take 1-6 weeks.",
+  "last_updated": "2026-05-23",
+  "source_url": "https://www.aic.sg/care-services/aic-care-connect"
+}

@@ -1,0 +1,54 @@
+{
+  "service_id": "FAMNEX-001",
+  "service_name": "Family Nexus @ Our Tampines Hub",
+  "agency": "SingHealth (in collaboration with Families for Life Council, MSF)",
+  "location_type": "Physical_OTH",
+  "rich_description": "Family Nexus @ Our Tampines Hub (FamNex@OTH) is a one-stop community wellness hub for families with babies, newborns, infants, toddlers, and young children, co-locating health and social services in a single drop-in space inside Our Tampines Hub. It is a collaboration between the Public Healthcare Clusters, the Families for Life (FFL) Council under the Ministry of Social and Family Development (MSF), and community-based service providers, and the OTH site is managed by SingHealth. Couples and families can come here for advice and support across four life stages: family planning and preconception health (advice for couples thinking about having a baby — fertility, lifestyle, health screening); maternal health and wellness during and after pregnancy (prenatal care, postnatal recovery, breastfeeding support, mental wellbeing for new mothers); child health and development for ages 0 to 6 (developmental milestones, childhood immunisation and vaccination guidance for newborns, infants, and toddlers, early intervention referral, parenting in the early years); and marriage and parenting (preparing for marriage, strengthening relationships, parenting workshops and resources). The hub offers three additional service streams alongside the advisory areas: (1) Community Nursing Services for Women and Children — a registered nurse provides health checks, basic clinical assessments, lactation and breastfeeding support, postnatal recovery checks, women's wellness consultations, and child growth, immunisation, vaccination, and development reviews for babies and young children, with onward referral to a polyclinic, hospital, or GP where needed; this is the natural first stop for booking or asking about a newborn's or infant's first vaccinations; (2) Families for Life (FFL) Programmes — workshops, talks, and group sessions run under the Families for Life Council covering marriage preparation, marital communication, parenting at different life stages, and strengthening family relationships; and (3) Events and Activities — regular community events, drop-in family activities, parent-child play sessions, festive celebrations, and partner-led programmes that turn the hub into a community space where families can meet, interact, and connect with one another. Walk-ins are welcome for advisory and the community space; nursing consultations, FFL programmes, and events may require registration in advance. Open to all residents — citizens, PRs, and foreigners.",
+  "eligibility": {
+    "citizenship": [
+      "citizen",
+      "PR",
+      "foreigner"
+    ],
+    "age_min": null,
+    "age_max": null,
+    "income_ceiling_monthly_sgd": null,
+    "employment_status": null,
+    "other_criteria": [
+      "Designed for couples planning for marriage or a baby, expecting mothers, new parents, and families with young children (0 to 6 years old)",
+      "Community Nursing Services target women (pre/post-natal, women's wellness) and children (growth, immunisation, development reviews)",
+      "Families for Life (FFL) Programmes are open to couples, parents, and families at any life stage",
+      "Walk-ins accepted for advisory and community space; nursing consultations, FFL programmes, and events may require advance registration",
+      "No income or citizenship restriction for general advisory and community-space use"
+    ]
+  },
+  "required_documents": [
+    {
+      "name": "NRIC / FIN / passport",
+      "required_if": "registering for a programme or consultation",
+      "notes": "Not required for general drop-in or community space use"
+    },
+    {
+      "name": "Child's health booklet",
+      "required_if": "seeking child health or development advice",
+      "notes": "Bring along if available so staff can review immunisation and milestone history"
+    }
+  ],
+  "oth_location": "Our Tampines Hub, #01-11 (near Lift Lobby B / Gate 10), 1 Tampines Walk, Singapore 528523",
+  "operating_hours": {
+    "mon-fri": "09:30-12:30, 13:30-17:30",
+    "sat": "09:30-16:00",
+    "sun": "closed",
+    "public_holidays": "closed"
+  },
+  "contact": {
+    "phone": "6592 6732",
+    "email": "familynexusoth@singhealth.com.sg",
+    "website": "https://www.singhealth.com.sg/community-care/connect-with-our-place-based-care-team/family-nexus/our-tampines-hub"
+  },
+  "walk_in_accepted": true,
+  "appointment_required": false,
+  "typical_processing_time": "Walk-in advisory typically same visit; programme registration confirmed within a few working days",
+  "last_updated": "2026-05-23",
+  "source_url": "https://www.singhealth.com.sg/community-care/connect-with-our-place-based-care-team/family-nexus/our-tampines-hub"
+}

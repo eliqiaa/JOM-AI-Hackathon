@@ -1,0 +1,43 @@
+{
+  "service_id": "AIC-002",
+  "service_name": "Home Caregiving Grant (HCG)",
+  "agency": "Agency for Integrated Care",
+  "rich_description": "Home Caregiving Grant is a monthly cash payout that helps families defray the cost of caring at home for a Singaporean or PR who needs permanent help with at least three activities of daily living (ADLs) such as bathing, dressing, feeding, transferring, toileting, or moving around. Common situations: long-term recovery from a stroke, advanced dementia, severe disability, or end-stage frailty. The grant is paid to the caregiver's bank account, and the amount is tiered by household monthly per capita income — lower income gets the higher tier. It is deliberately flexible: families can use it to pay for a domestic helper, transport to medical appointments, adult diapers, mobility aids, or just to ease the financial pressure of someone in the household giving up paid work to provide the care. Apply online via the AIC website using the caregiver's SingPass, or have the hospital Medical Social Worker submit during discharge planning.",
+  "eligibility": {
+    "citizenship": ["citizen", "PR"],
+    "age_min": null,
+    "age_max": null,
+    "income_ceiling_monthly_sgd": 3600,
+    "employment_status": null,
+    "other_criteria": [
+      "Care recipient is a Singapore citizen or PR",
+      "Care recipient needs permanent help with at least 3 Activities of Daily Living (ADLs)",
+      "Cared for at home, not in residential care",
+      "Functional assessment certifies the ADL needs",
+      "Household monthly per capita income below the HCG ceiling (higher tier for lower income)"
+    ]
+  },
+  "required_documents": [
+    {"name": "NRIC", "required_if": null, "notes": "For both care recipient and caregiver"},
+    {"name": "Functional Assessment Report", "required_if": null, "notes": "Issued by a doctor, AIC-appointed assessor, or hospital MSW; confirms ≥3 ADLs needing help"},
+    {"name": "Proof of household income", "required_if": null, "notes": "Payslips, CPF contribution history, or income tax statements for all working household members"},
+    {"name": "Bank account details", "required_if": null, "notes": "Caregiver's account for payout transfer"}
+  ],
+  "oth_location": "Online application via aic.sg using SingPass. Hospital MSWs and Senior Care Centres can assist with the application. PLACEHOLDER — verify if any AIC counter at Tampines OTH handles HCG in person; default routing is online + hospital MSW.",
+  "operating_hours": {
+    "online": "24/7",
+    "mon-fri": "08:30-20:30 (careline 1800-650-6060)",
+    "sat": "08:30-16:00 (careline)",
+    "sun": "closed (careline)"
+  },
+  "contact": {
+    "phone": "1800-650-6060",
+    "email": "enquiries@aic.sg",
+    "website": "https://www.aic.sg/financial-assistance/home-caregiving-grant"
+  },
+  "walk_in_accepted": false,
+  "appointment_required": false,
+  "typical_processing_time": "Functional assessment + paperwork review approximately 4-6 weeks from submission. Payouts start the month after approval and are typically backdated to the application month.",
+  "last_updated": "2026-05-20",
+  "source_url": "https://www.aic.sg/financial-assistance/home-caregiving-grant"
+}

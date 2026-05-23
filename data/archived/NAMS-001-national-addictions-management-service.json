@@ -1,0 +1,40 @@
+{
+  "service_id": "NAMS-001",
+  "service_name": "National Addictions Management Service (NAMS)",
+  "agency": "IMH",
+  "rich_description": "The National Addictions Management Service (NAMS) is the Institute of Mental Health's specialist service for all forms of addiction — alcohol, drugs (legal and illegal), gambling, gaming, pornography and sex addiction — and is the right place when an addiction is hurting work, finances, relationships, or health. Treatment is multidisciplinary: a psychiatrist assesses and prescribes (including medication-assisted detox for severe alcohol or opioid dependence), a clinical psychologist runs evidence-based therapy (motivational interviewing, CBT, relapse prevention), and a medical social worker handles family ripple effects (debt counselling for gamblers, ComCare referrals, child safety if relevant). The All Addictions Helpline (6-RECOVER, 6-7326837) is the 24-hour single number for the addicted person, family members worried about a loved one, or anyone wanting to understand what to do. NAMS is open to all Singapore residents — fees follow IMH's subsidised rates with means-tested support, and MediFund covers those who cannot pay. Confidentiality is protected by law; coming to NAMS does not create a criminal record.",
+  "eligibility": {
+    "citizenship": ["citizen", "PR", "foreigner"],
+    "age_min": null,
+    "age_max": null,
+    "income_ceiling_monthly_sgd": null,
+    "employment_status": null,
+    "other_criteria": [
+      "Open to anyone in Singapore with an addiction concern; foreigners pay non-subsidised rates",
+      "Concerned family member can call the helpline first, without the addicted person's consent",
+      "Voluntary treatment does not create a criminal record",
+      "Medical bills assessed for MediShield / MediSave / MediFund support"
+    ]
+  },
+  "required_documents": [
+    {"name": "NRIC / FIN / passport", "required_if": null, "notes": "For registration; helpline calls are anonymous"},
+    {"name": "Referral letter", "required_if": "if referred by GP or polyclinic", "notes": "Optional — self-referral accepted"},
+    {"name": "Income documents", "required_if": "applying for subsidised rates", "notes": null}
+  ],
+  "oth_location": "NAMS operates out of IMH at Buangkok Green (10 Buangkok View). The All Addictions Helpline is staffed 24/7. PLACEHOLDER — verify whether a community outreach session is run periodically at Tampines OTH or via Tampines Polyclinic.",
+  "operating_hours": {
+    "24-7": "All Addictions Helpline 6-RECOVER (6-7326837)",
+    "mon-fri": "08:30-17:30 (NAMS clinic at IMH)",
+    "sat-sun": "closed (clinic); helpline always open"
+  },
+  "contact": {
+    "phone": "6-732-6837",
+    "email": "nams@imh.com.sg",
+    "website": "https://www.imh.com.sg/Clinical-Services/Departments/National-Addictions-Management-Service-NAMS"
+  },
+  "walk_in_accepted": false,
+  "appointment_required": true,
+  "typical_processing_time": "First appointment typically within 2-4 weeks of registration; urgent cases (severe withdrawal, suicidal ideation) seen same-week.",
+  "last_updated": "2026-05-20",
+  "source_url": "https://www.imh.com.sg/Clinical-Services/Departments/National-Addictions-Management-Service-NAMS"
+}

@@ -1,0 +1,41 @@
+{
+  "service_id": "CPF-002",
+  "service_name": "Silver Support Scheme",
+  "agency": "CPF Board",
+  "location_type": "Digital_Hotline",
+  "rich_description": "Silver Support is a quarterly cash payout from the government for elderly Singaporeans aged 65 and above who had low incomes through their working years, accumulated little CPF savings, and live in smaller HDB flats. It is one of the main pillars of retirement support for low-income seniors. The scheme is automatic — there is no application form — and is meant as a supplement on top of family support and personal savings, not a replacement for either. Payments arrive every three months in January, April, July, and October, sent to the senior's bank account or PayNow. Typical recipients are retired cleaners, hawkers, taxi drivers, factory workers, and people who spent decades caregiving without paid work. Strictly for retired or near-retired low-income seniors. If an elderly parent is wondering whether they qualify, whether the amount is correct, or whether they need to do anything, eligibility is reassessed annually and the most reliable way to check is through the Silver Support portal on the CPF website or by phoning the CPF careline. This sits alongside ComCare Long-Term Assistance (MSF-002) which is for those unable to work at all, while Silver Support is specifically retirement-side income for seniors who DID work but earned little.",
+  "eligibility": {
+    "citizenship": ["citizen"],
+    "age_min": 65,
+    "age_max": null,
+    "income_ceiling_monthly_sgd": null,
+    "employment_status": null,
+    "other_criteria": [
+      "Aged 65 and above",
+      "Total CPF contributions through working years below the Silver Support threshold",
+      "Lives in a 1-room to 5-room HDB flat (not Executive flat or private property)",
+      "Monthly household income per person below the Silver Support cut-off (assessed annually)",
+      "Automatic enrolment — no form to fill",
+      "For in-person help checking eligibility or status, walk in to ServiceSG @ OTH Level 1 (SSGC-001)"
+    ]
+  },
+  "required_documents": [
+    {"name": "NRIC", "required_if": "checking status in person", "notes": "Most recipients do not need to submit anything — enrolment is automatic"}
+  ],
+  "oth_location": "No CPF counter at Our Tampines Hub. The scheme runs automatically; status can be checked online at cpf.gov.sg/silversupport or by phoning 1800-227-1188. Nearest physical CPF presence is the Tampines CPF Service Centre at Tampines Central (a short walk from OTH) [VERIFY exact address]. For in-person help at OTH itself, walk in to the ServiceSG Centre at OTH Level 1 (see SSGC-001).",
+  "operating_hours": {
+    "online": "24/7 (cpf.gov.sg)",
+    "mon-fri": "08:00-17:30 (CPF Service Centre)",
+    "sat-sun": "closed (CPF Service Centre)"
+  },
+  "contact": {
+    "phone": "1800-227-1188",
+    "email": null,
+    "website": "https://www.cpf.gov.sg/member/schemes/schemes/retirement/silver-support-scheme"
+  },
+  "walk_in_accepted": false,
+  "appointment_required": false,
+  "typical_processing_time": "Automatic quarterly payouts (Jan, Apr, Jul, Oct) if eligible. Eligibility reassessed annually based on the latest year's data.",
+  "last_updated": "2026-05-23",
+  "source_url": "https://www.cpf.gov.sg/member/schemes/schemes/retirement/silver-support-scheme"
+}

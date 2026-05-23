@@ -1,0 +1,39 @@
+{
+  "service_id": "MOH-002",
+  "service_name": "Pioneer Generation Package",
+  "agency": "MOH",
+  "rich_description": "The Pioneer Generation Package is a lifelong set of medical subsidies and cash benefits given automatically to Singapore citizens born on or before 31 December 1949 who became citizens by 31 December 1986, recognising their contribution to the nation's early years. It includes higher outpatient subsidies at polyclinics and CHAS GP and dentist clinics, full MediShield Life premium subsidies, additional MediSave top-ups, and the Pioneer Generation Disability Assistance Scheme (PG-DAS) which pays up to a few hundred dollars a month to seniors with moderate-to-severe functional disability. You do not apply — eligibility is automatic and the Pioneer Generation card is issued. If your elderly parent qualifies and your family is unsure what they are entitled to, this is the umbrella scheme to ask about. Subsidies apply at CHAS-participating clinics islandwide and at all public polyclinics and hospitals.",
+  "eligibility": {
+    "citizenship": ["citizen"],
+    "age_min": 76,
+    "age_max": null,
+    "income_ceiling_monthly_sgd": null,
+    "employment_status": null,
+    "other_criteria": [
+      "Born on or before 31 December 1949",
+      "Obtained Singapore citizenship on or before 31 December 1986",
+      "Pioneer Generation card issued automatically — no application required",
+      "Additional PG-DAS cash payout requires a functional assessment showing moderate-to-severe disability"
+    ]
+  },
+  "required_documents": [
+    {"name": "NRIC", "required_if": null, "notes": "Card issued automatically — physical card is mailed"},
+    {"name": "Functional Assessment Report", "required_if": "applying for PG-DAS cash payout", "notes": "Issued by a doctor or AIC-appointed assessor"}
+  ],
+  "oth_location": "Online via LifeSG app or gov.sg/pioneer; CPF Service Centres and Community Centres assist with enquiries. PLACEHOLDER — verify whether ServiceSG counter at Tampines OTH handles Pioneer Generation enquiries.",
+  "operating_hours": {
+    "online": "24/7",
+    "mon-fri": "08:00-17:30 (CPF Service Centre)",
+    "sat-sun": "closed (CPF Service Centre)"
+  },
+  "contact": {
+    "phone": "1800-2222-888",
+    "email": null,
+    "website": "https://www.moh.gov.sg/healthcare-schemes-subsidies/pioneer-generation"
+  },
+  "walk_in_accepted": false,
+  "appointment_required": false,
+  "typical_processing_time": "Automatic — subsidies apply immediately at every clinic visit. PG-DAS cash payout approved typically within 4-6 weeks of functional assessment.",
+  "last_updated": "2026-05-20",
+  "source_url": "https://www.moh.gov.sg/healthcare-schemes-subsidies/pioneer-generation"
+}

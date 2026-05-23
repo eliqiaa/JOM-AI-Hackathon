@@ -1,0 +1,362 @@
+{
+  "meta": {
+    "version": "2.4",
+    "created": "2026-05-22",
+    "service_catalogue_size": 23,
+    "scope": "Services accessible at OTH — either via a physical counter (location_type=Physical_OTH) or via hotline/website with ServiceSG @ OTH as the in-person digital-assistance anchor (location_type=Digital_Hotline).",
+    "notes": "Each entry has at least one expected_top_id (a service that MUST appear in top-K for the query to be considered satisfied). Recall@K = fraction of queries where at least one expected_top_id is in top-K. MRR uses the rank of the first matching expected_top_id. OOS queries set expect_oos=true; without an OPENAI_API_KEY the reranker is bypassed, so the below-threshold confidence_low trigger does not fire. v2.4 restores CPF-001 (Workfare Income Supplement) and CPF-002 (Silver Support) as Digital_Hotline services with the ServiceSG @ OTH hand-off pattern."
+  },
+  "queries": [
+    {
+      "id": "G001",
+      "category": "single_intent",
+      "query": "I cannot pay rent and feed my family this month",
+      "expected_top_ids": ["MSF-001", "MSF-003"],
+      "user_context": null,
+      "expect_oos": false,
+      "notes": "ComCare Short-Medium-Term is the canonical answer; Interim is also valid for acute cash-out cases."
+    },
+    {
+      "id": "G002",
+      "category": "single_intent",
+      "query": "I want free career coaching at OTH",
+      "expected_top_ids": ["WSG-001"],
+      "user_context": null,
+      "expect_oos": false,
+      "notes": "WSG Careers Connect counter at OTH."
+    },
+    {
+      "id": "G003",
+      "category": "single_intent",
+      "query": "Behind on my HDB mortgage instalments after losing job",
+      "expected_top_ids": ["HDB-001"],
+      "user_context": null,
+      "expect_oos": false,
+      "notes": "HDB Financial Assistance Scheme — mortgage rescue."
+    },
+    {
+      "id": "G004",
+      "category": "single_intent",
+      "query": "Want to apply for HDB rental flat household income $1200",
+      "expected_top_ids": ["HDB-003"],
+      "user_context": null,
+      "expect_oos": false,
+      "notes": "Public Rental Scheme ceiling is $1,500; fits."
+    },
+    {
+      "id": "G005",
+      "category": "single_intent",
+      "query": "How can I use the $500 SkillsFuture Credit to take a course",
+      "expected_top_ids": ["SSG-001"],
+      "user_context": null,
+      "expect_oos": false,
+      "notes": "Canonical SkillsFuture Credit query."
+    },
+    {
+      "id": "G006",
+      "category": "single_intent",
+      "query": "Mid-career switch to a new industry with salary support during training",
+      "expected_top_ids": ["WSG-002"],
+      "user_context": null,
+      "expect_oos": false,
+      "notes": "Career Conversion Programme — employer-sponsored conversion."
+    },
+    {
+      "id": "G007",
+      "category": "single_intent",
+      "query": "I am 50 and unemployed, need a real job attachment not just resume help",
+      "expected_top_ids": ["WSG-003"],
+      "user_context": null,
+      "expect_oos": false,
+      "notes": "Mid-Career Pathways Programme for 40+ unemployed."
+    },
+    {
+      "id": "G008",
+      "category": "single_intent",
+      "query": "Want to try out a new job for a few months before signing permanent contract",
+      "expected_top_ids": ["WSG-004"],
+      "user_context": null,
+      "expect_oos": false,
+      "notes": "Career Trial — short-term de-risking."
+    },
+    {
+      "id": "G009",
+      "category": "single_intent",
+      "query": "Lost my flat in a divorce, want to own again with my young kids",
+      "expected_top_ids": ["HDB-002"],
+      "user_context": null,
+      "expect_oos": false,
+      "notes": "Fresh Start Housing Scheme — second-timer with children."
+    },
+    {
+      "id": "G010",
+      "category": "single_intent",
+      "query": "Senior 65+ wants to monetise small flat for retirement income while still living in it",
+      "expected_top_ids": ["HDB-004"],
+      "user_context": null,
+      "expect_oos": false,
+      "notes": "Lease Buyback Scheme."
+    },
+    {
+      "id": "G011",
+      "category": "single_intent",
+      "query": "First-time home buyer grant for low income family",
+      "expected_top_ids": ["HDB-005"],
+      "user_context": null,
+      "expect_oos": false,
+      "notes": "Enhanced CPF Housing Grant."
+    },
+    {
+      "id": "G012",
+      "category": "single_intent",
+      "query": "Low-wage worker, want to upskill but cannot afford to lose income",
+      "expected_top_ids": ["SSG-002"],
+      "user_context": null,
+      "expect_oos": false,
+      "notes": "Workfare Skills Support — absentee payroll is the headline feature."
+    },
+    {
+      "id": "G013",
+      "category": "multi_intent",
+      "query": "I lost my job and can't pay my HDB instalment",
+      "expected_top_ids": ["HDB-001", "WSG-001", "MSF-001"],
+      "user_context": null,
+      "expect_oos": false,
+      "notes": "Mortgage rescue + job search + interim cash are all valid."
+    },
+    {
+      "id": "G014",
+      "category": "multi_intent",
+      "query": "Retrenched at 45, family needs food and we have a mortgage",
+      "expected_top_ids": ["WSG-001", "WSG-003", "MSF-001", "HDB-001"],
+      "user_context": null,
+      "expect_oos": false,
+      "notes": "Multi-domain need: career + cash + mortgage."
+    },
+    {
+      "id": "G015",
+      "category": "multi_intent",
+      "query": "Divorced mom with two young kids, struggling to keep the flat",
+      "expected_top_ids": ["HDB-001", "MSF-001", "MSF-007", "HDB-002"],
+      "user_context": null,
+      "expect_oos": false,
+      "notes": "Multi-pronged: housing rescue, financial, FSC intake, fresh-start path."
+    },
+    {
+      "id": "G016",
+      "category": "multi_intent",
+      "query": "Low-income family overwhelmed, don't know where to start",
+      "expected_top_ids": ["MSF-007", "MSF-001"],
+      "user_context": null,
+      "expect_oos": false,
+      "notes": "FSC is the holistic-intake entry point."
+    },
+    {
+      "id": "G017",
+      "category": "singlish",
+      "query": "kena retrenched, where to find new job",
+      "expected_top_ids": ["WSG-001", "WSG-003"],
+      "user_context": null,
+      "expect_oos": false,
+      "notes": "Singlish 'kena' expands via acronym dict."
+    },
+    {
+      "id": "G018",
+      "category": "singlish",
+      "query": "No money to pay bills lah, very jialat",
+      "expected_top_ids": ["MSF-001", "MSF-003"],
+      "user_context": null,
+      "expect_oos": false,
+      "notes": "Singlish 'jialat' + 'lah'."
+    },
+    {
+      "id": "G019",
+      "category": "acronym",
+      "query": "How to apply for the CCP at WSG",
+      "expected_top_ids": ["WSG-002"],
+      "user_context": null,
+      "expect_oos": false,
+      "notes": "CCP = Career Conversion Programme."
+    },
+    {
+      "id": "G020",
+      "category": "acronym",
+      "query": "EHG grant for buying first BTO",
+      "expected_top_ids": ["HDB-005"],
+      "user_context": null,
+      "expect_oos": false,
+      "notes": "EHG = Enhanced CPF Housing Grant; BTO acronym."
+    },
+    {
+      "id": "G021",
+      "category": "negation",
+      "query": "I do not want financial assistance, I want to find a job",
+      "expected_top_ids": ["WSG-001", "WSG-002", "WSG-003", "WSG-004"],
+      "user_context": null,
+      "expect_oos": false,
+      "notes": "Negation is hard for BM25; reranker should pick a WSG service."
+    },
+    {
+      "id": "G022",
+      "category": "vague",
+      "query": "I need help",
+      "expected_top_ids": ["MSF-007", "MSF-001"],
+      "user_context": null,
+      "expect_oos": false,
+      "notes": "Maximally vague — FSC or ComCare are reasonable defaults."
+    },
+    {
+      "id": "G023",
+      "category": "vague",
+      "query": "Where do I start with my situation",
+      "expected_top_ids": ["MSF-007"],
+      "user_context": null,
+      "expect_oos": false,
+      "notes": "FSC is the right answer for 'where do I start'."
+    },
+    {
+      "id": "G024",
+      "category": "oos",
+      "query": "What time does the food court at OTH close tonight",
+      "expected_top_ids": [],
+      "user_context": null,
+      "expect_oos": true,
+      "notes": "OOS: operating-hours query."
+    },
+    {
+      "id": "G025",
+      "category": "oos",
+      "query": "Where can I play badminton at OTH",
+      "expected_top_ids": [],
+      "user_context": null,
+      "expect_oos": true,
+      "notes": "OOS: facility query."
+    },
+    {
+      "id": "G026",
+      "category": "oos",
+      "query": "How do I park my car at Our Tampines Hub",
+      "expected_top_ids": [],
+      "user_context": null,
+      "expect_oos": true,
+      "notes": "OOS: facility query."
+    },
+    {
+      "id": "G027",
+      "category": "eligibility",
+      "query": "I am 18 and just left school, no money no job",
+      "expected_top_ids": ["WSG-001", "MSF-007", "MSF-003"],
+      "user_context": {"citizenship": "citizen", "age": 18},
+      "expect_oos": false,
+      "notes": "ComCare Short-Medium has age_min=21 → should be filtered. WSG-001 (no age limit) and FSC remain."
+    },
+    {
+      "id": "G028",
+      "category": "eligibility",
+      "query": "Senior 70+ Singaporean wants to downsize home for cash",
+      "expected_top_ids": ["HDB-006", "HDB-004"],
+      "user_context": {"citizenship": "citizen", "age": 70},
+      "expect_oos": false,
+      "notes": "HDB-006 (age_min=55) and HDB-004 (age_min=65) both eligible."
+    },
+    {
+      "id": "G029",
+      "category": "single_intent",
+      "query": "We are planning to have a baby, where can we get preconception advice in Tampines",
+      "expected_top_ids": ["FAMNEX-001"],
+      "user_context": null,
+      "expect_oos": false,
+      "notes": "Family Nexus @ OTH — preconception / family planning advisory."
+    },
+    {
+      "id": "G030",
+      "category": "single_intent",
+      "query": "New mother needs breastfeeding support and postnatal check",
+      "expected_top_ids": ["FAMNEX-001"],
+      "user_context": null,
+      "expect_oos": false,
+      "notes": "Community Nursing Services for Women and Children stream at FamNex."
+    },
+    {
+      "id": "G031",
+      "category": "single_intent",
+      "query": "Marriage workshop for couples thinking of getting married",
+      "expected_top_ids": ["FAMNEX-001"],
+      "user_context": null,
+      "expect_oos": false,
+      "notes": "Families for Life (FFL) Programmes stream at FamNex."
+    },
+    {
+      "id": "G032",
+      "category": "acronym",
+      "query": "FamNex OTH events for families",
+      "expected_top_ids": ["FAMNEX-001"],
+      "user_context": null,
+      "expect_oos": false,
+      "notes": "Brand-name (FamNex) + events stream. Tests famnex acronym expansion in BM25."
+    },
+    {
+      "id": "G033",
+      "category": "single_intent",
+      "query": "my elderly mother had a stroke and I need help arranging care at home",
+      "expected_top_ids": ["AIC-001", "AIC-002"],
+      "user_context": null,
+      "expect_oos": false,
+      "notes": "Eldercare entry point. AIC-001 (Care Connect hotline) and AIC-002 (HCG) both valid. Digital_Hotline services."
+    },
+    {
+      "id": "G034",
+      "category": "single_intent",
+      "query": "monthly cash payout for caring for parent with dementia at home",
+      "expected_top_ids": ["AIC-002"],
+      "user_context": null,
+      "expect_oos": false,
+      "notes": "Canonical Home Caregiving Grant query. Digital_Hotline — chatbot should route to ServiceSG @ OTH for in-person help."
+    },
+    {
+      "id": "G035",
+      "category": "single_intent",
+      "query": "elderly person needs help filling in online government form SingPass at OTH",
+      "expected_top_ids": ["SSGC-001"],
+      "user_context": null,
+      "expect_oos": false,
+      "notes": "ServiceSG @ OTH is the Physical_OTH anchor for any digital-help request. The hub for the Digital_Hotline hand-off pattern."
+    },
+    {
+      "id": "G036",
+      "category": "multi_intent",
+      "query": "My baby was just born last month and I need to book her first vaccinations. Also, how do I link her to my Singpass to get the Baby Bonus?",
+      "expected_top_ids": ["MSF-008", "FAMNEX-001", "SSGC-001"],
+      "user_context": null,
+      "expect_oos": false,
+      "notes": "Multi-intent newborn query covering Baby Bonus + child SingPass linking + first vaccinations. Regression guard against the AIC SingPass-leak bug — AIC services must NOT appear in top 3 here."
+    },
+    {
+      "id": "G037",
+      "category": "single_intent",
+      "query": "Baby Bonus Cash Gift and CDA for newborn child",
+      "expected_top_ids": ["MSF-008"],
+      "user_context": null,
+      "expect_oos": false,
+      "notes": "Canonical Baby Bonus query. MSF-008 is Digital_Hotline; chatbot should also mention ServiceSG @ OTH for in-person help."
+    },
+    {
+      "id": "G038",
+      "category": "single_intent",
+      "query": "Low-wage cleaner wants to know about Workfare Income Supplement payouts",
+      "expected_top_ids": ["CPF-001"],
+      "user_context": null,
+      "expect_oos": false,
+      "notes": "Canonical WIS query. CPF-001 is Digital_Hotline; chatbot should mention ServiceSG @ OTH for self-employed declaration help."
+    },
+    {
+      "id": "G039",
+      "category": "single_intent",
+      "query": "my dad is 70, worked as a hawker all his life, very little CPF — is there government cash support every few months",
+      "expected_top_ids": ["CPF-002", "MSF-002", "HDB-004"],
+      "user_context": null,
+      "expect_oos": false,
+      "notes": "Natural-language Silver Support query. Multiple acceptable answers because the situation also qualifies for ComCare LTA and HDB Lease Buyback. In keyless mode the dense embedder may pull HDB equity schemes first; reranker should prefer CPF-002 from the 'quarterly payout' signature."
+    }
+  ]
+}

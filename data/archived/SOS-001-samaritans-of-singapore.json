@@ -1,0 +1,38 @@
+{
+  "service_id": "SOS-001",
+  "service_name": "Samaritans of Singapore (SOS)",
+  "agency": "SOS",
+  "rich_description": "The Samaritans of Singapore (SOS) operates Singapore's primary 24-hour suicide prevention and emotional crisis support hotline. Trained volunteers and staff provide confidential, non-judgemental listening for anyone who feels suicidal, is thinking about ending their life, wants to kill themselves, is self-harming or cutting, is grieving a loss, feels overwhelmed, lonely, or in any kind of acute emotional distress — including family members and friends of someone they are worried about. Contact channels include the 24-hour hotline (1-767), the CareText WhatsApp/SMS chat for those who cannot speak aloud (e.g., the abuser is in the next room), email support for non-urgent contact, and face-to-face follow-up counselling at the SOS centre after the immediate crisis has passed. There is no fee for any SOS service. SOS will also link callers to longer-term mental health support (IMH, polyclinic mental health team, or community counselling) if they want that bridge. Children and youth who are uncomfortable with SOS can also be referred to Tinkle Friend (4-12yo), eC2 / Touchline, or CHAT (16-30yo).",
+  "eligibility": {
+    "citizenship": ["citizen", "PR", "foreigner"],
+    "age_min": null,
+    "age_max": null,
+    "income_ceiling_monthly_sgd": null,
+    "employment_status": null,
+    "other_criteria": [
+      "Open to anyone in Singapore in emotional distress — no eligibility test",
+      "Free and anonymous; caller does not need to share NRIC or any identifying detail",
+      "24-hour hotline at 1-767; CareText (WhatsApp/SMS) at 9151-1767 staffed 24/7",
+      "Email support@sos.org.sg for non-urgent contact (response within 24-72 hours)"
+    ]
+  },
+  "required_documents": [
+    {"name": "None for hotline / CareText / email", "required_if": null, "notes": "Caller can stay fully anonymous"},
+    {"name": "NRIC", "required_if": "in-person follow-up counselling", "notes": "Only for the in-person counselling track, not for the hotline"}
+  ],
+  "oth_location": "SOS is a phone- and chat-based service — no walk-in counter at OTH. In-person counselling is at SOS's centre at 10 Cantonment Close. PLACEHOLDER — verify whether Tampines OTH has a quiet space publicly available for people who need to make the call privately.",
+  "operating_hours": {
+    "24-7": "Hotline 1-767 and CareText 9151-1767 staffed every day, all hours",
+    "mon-fri": "09:00-18:00 (in-person counselling at SOS centre, by appointment)"
+  },
+  "contact": {
+    "phone": "1-767",
+    "email": "pat@sos.org.sg",
+    "website": "https://www.sos.org.sg"
+  },
+  "walk_in_accepted": false,
+  "appointment_required": false,
+  "typical_processing_time": "Hotline answered within minutes; CareText acknowledged within minutes during peak load. In-person counselling appointment typically within 1-2 weeks.",
+  "last_updated": "2026-05-20",
+  "source_url": "https://www.sos.org.sg"
+}

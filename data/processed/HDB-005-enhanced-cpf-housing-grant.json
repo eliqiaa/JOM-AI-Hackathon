@@ -1,0 +1,69 @@
+{
+  "service_id": "HDB-005",
+  "service_name": "Enhanced CPF Housing Grant (EHG)",
+  "agency": "HDB",
+  "location_type": "Physical_OTH",
+  "rich_description": "The Enhanced CPF Housing Grant (EHG) is the main first-timer cash grant for lower- and middle-income Singapore citizen families buying their first HDB flat — whether a new BTO or a resale flat. Grant amounts scale by average monthly household income, from $5,000 (income $9,000) up to $80,000 (income $1,500 and below). Singles aged 35+ buying on their own get half the amount via EHG (Singles), with a household income ceiling of $4,500. The grant is paid into the buyer's CPF Ordinary Account and used to offset the flat purchase, reducing both the down-payment and monthly mortgage instalment. Combined with the Family Grant and Proximity Housing Grant where applicable, an eligible lower-income family can receive over $120,000 in total housing grants. To qualify, at least one applicant must have worked continuously for the 12 months before the application and still be working at the time of application — this is the rule that catches most first-time buyers off guard.",
+  "eligibility": {
+    "citizenship": [
+      "citizen"
+    ],
+    "age_min": 21,
+    "age_max": null,
+    "income_ceiling_monthly_sgd": 9000,
+    "employment_status": [
+      "employed",
+      "self_employed"
+    ],
+    "other_criteria": [
+      "At least one Singapore citizen applicant; spouse can be citizen or PR",
+      "First-timer: applicant and spouse have not received any housing subsidy from HDB before",
+      "At least one applicant must have worked continuously for 12 months prior to application and still be working",
+      "Singles aged 35+ buying on their own qualify under EHG (Singles) with household income ceiling $4,500",
+      "Average monthly household income at or below $9,000 (family applicants)"
+    ]
+  },
+  "required_documents": [
+    {
+      "name": "NRIC",
+      "required_if": null,
+      "notes": "For all applicants"
+    },
+    {
+      "name": "Income documents",
+      "required_if": null,
+      "notes": "12 months of payslips or CPF contribution history showing continuous employment"
+    },
+    {
+      "name": "Marriage certificate",
+      "required_if": "applying as a family",
+      "notes": null
+    },
+    {
+      "name": "HDB Flat Eligibility (HFE) letter",
+      "required_if": null,
+      "notes": "Must be obtained before flat application; consolidates EHG and loan assessment"
+    },
+    {
+      "name": "Income tax NOA",
+      "required_if": "self-employed",
+      "notes": "Most recent year"
+    }
+  ],
+  "oth_location": "Level 3, HDB Tampines Branch (Customer Service Counters). HFE letter is applied for online; OTH staff assist with login and document upload for families unfamiliar with the portal.",
+  "operating_hours": {
+    "mon-fri": "08:00-17:00",
+    "sat": "08:00-13:00",
+    "sun": "closed"
+  },
+  "contact": {
+    "phone": "1800-225-5432",
+    "email": "hdbtampines@hdb.gov.sg",
+    "website": "https://www.hdb.gov.sg/residential/buying-a-flat/understanding-your-eligibility-and-housing-loan-options/cpf-housing-grants-for-first-timer-applicants"
+  },
+  "walk_in_accepted": true,
+  "appointment_required": false,
+  "typical_processing_time": "HFE letter issued within 21 working days of complete submission. Grant is disbursed at flat completion (BTO) or on resale completion.",
+  "last_updated": "2026-05-20",
+  "source_url": "https://www.hdb.gov.sg/residential/buying-a-flat/understanding-your-eligibility-and-housing-loan-options/cpf-housing-grants-for-first-timer-applicants"
+}

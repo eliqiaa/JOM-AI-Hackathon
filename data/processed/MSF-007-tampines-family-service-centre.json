@@ -1,0 +1,62 @@
+{
+  "service_id": "MSF-007",
+  "service_name": "Tampines Family Service Centre",
+  "agency": "MSF",
+  "location_type": "Physical_OTH",
+  "rich_description": "The Tampines Family Service Centre (TFSC) is the social-work entry point for any family in distress in the Tampines area. Walk in (or call ahead) and a social worker will sit with you, listen to the full picture — money troubles, family conflict, marital crisis, child or eldercare strain, mental health worries, school problems, domestic violence concerns — and then write a referral plan that connects you to the specific schemes you qualify for: ComCare for cash, HDB for housing, AIC for caregiving, MOE FAS for school fees, FSC counselling for relationship distress, and crisis services where needed. TFSC also runs in-house casework for ongoing family support, individual counselling, marital counselling, and parenting support groups, with sliding-scale fees for those who can afford to contribute. If you do not know which scheme to apply for, or your situation cuts across many agencies, this is the right first stop. Casework is confidential and continues across multiple visits until the family is stable.",
+  "eligibility": {
+    "citizenship": [
+      "citizen",
+      "PR",
+      "foreigner"
+    ],
+    "age_min": null,
+    "age_max": null,
+    "income_ceiling_monthly_sgd": null,
+    "employment_status": null,
+    "other_criteria": [
+      "Open to any resident of Tampines, Pasir Ris, and surrounding areas",
+      "No income cut-off for first consultation; subsidised follow-up casework is means-tested",
+      "Foreigner spouses and children of citizens are welcomed — TFSC will refer to PAVE or other foreigner-friendly services where needed",
+      "Walk-ins accepted but appointment is preferred for non-urgent matters"
+    ]
+  },
+  "required_documents": [
+    {
+      "name": "NRIC",
+      "required_if": null,
+      "notes": "Or FIN / passport for foreigners"
+    },
+    {
+      "name": "Brief summary of the situation",
+      "required_if": null,
+      "notes": "Either written or recounted at intake — no formal form needed for first visit"
+    },
+    {
+      "name": "Income documents",
+      "required_if": "applying for subsidised ongoing casework",
+      "notes": null
+    },
+    {
+      "name": "Police report or medical report",
+      "required_if": "domestic violence or child safety concerns",
+      "notes": null
+    }
+  ],
+  "oth_location": "Level 4, Tampines Family Service Centre (within Our Tampines Hub). PLACEHOLDER — verify TFSC level number at OTH (this is widely cited as Level 4 but exact unit should be confirmed).",
+  "operating_hours": {
+    "mon-fri": "09:00-18:00",
+    "sat": "09:00-13:00 (by appointment)",
+    "sun": "closed (24/7 crisis hotline available)"
+  },
+  "contact": {
+    "phone": "1800-111-2222",
+    "email": "tfsc@msf.gov.sg",
+    "website": "https://www.msf.gov.sg/our-services/families"
+  },
+  "walk_in_accepted": true,
+  "appointment_required": false,
+  "typical_processing_time": "First consultation typically same-day for walk-ins, within 1 week for non-urgent appointments. Casework is ongoing and structured around the family's needs.",
+  "last_updated": "2026-05-20",
+  "source_url": "https://www.msf.gov.sg/our-services/families"
+}

@@ -1,0 +1,42 @@
+{
+  "service_id": "E2I-001",
+  "service_name": "NTUC e2i Career Services",
+  "agency": "NTUC e2i",
+  "rich_description": "The Employment and Employability Institute (e2i) is the labour-movement arm of NTUC that helps workers find jobs, upgrade their skills, and get back on their feet after retrenchment — running in parallel with Workforce Singapore but with stronger reach into union-affiliated and rank-and-file workers. e2i runs Career Coaching, job-matching events, Place-and-Train programmes (where the worker is hired first, then trained on the job with course fee subsidies of up to 90%), and Professional Conversion Programmes co-funded with WSG. It also operates retrenchment support clinics for affected workers when an employer announces large-scale layoffs, and the Operations and Technology Roadmap for low-wage workers in sectors like F&B, retail, and cleaning. NTUC membership is not required to use e2i services — non-members are welcome — but union members get additional career-credit subsidies and priority access to some courses. If you have a union, your union officer can warm-hand-off you to an e2i Career Coach.",
+  "eligibility": {
+    "citizenship": ["citizen", "PR"],
+    "age_min": 21,
+    "age_max": null,
+    "income_ceiling_monthly_sgd": null,
+    "employment_status": ["unemployed", "retrenched", "underemployed", "employed", "self_employed"],
+    "other_criteria": [
+      "Singapore citizen or PR",
+      "Open to NTUC members and non-members; union members get enhanced course-fee subsidies",
+      "Rank-and-file and low-wage workers explicitly served by Place-and-Train and Operations and Technology Roadmap programmes",
+      "Retrenched workers can walk in for retrenchment support without prior appointment"
+    ]
+  },
+  "required_documents": [
+    {"name": "NRIC", "required_if": null, "notes": null},
+    {"name": "Resume", "required_if": null, "notes": "Career coach helps refine if outdated"},
+    {"name": "Retrenchment letter", "required_if": "retrenchment support", "notes": "Strengthens case for priority placement"},
+    {"name": "NTUC membership card", "required_if": "claiming union-only subsidies", "notes": null},
+    {"name": "Last 3 months payslips", "required_if": null, "notes": "Establishes income context"}
+  ],
+  "oth_location": "e2i operates centres at NTUC Income Tampines and at NTUC's e2i West (Devan Nair Institute). Career coaching is also available via online booking. PLACEHOLDER — verify whether NTUC has a dedicated counter at Tampines OTH.",
+  "operating_hours": {
+    "mon-fri": "09:00-18:00",
+    "sat": "09:00-13:00 (limited services)",
+    "sun": "closed"
+  },
+  "contact": {
+    "phone": "6474-0606",
+    "email": "info@e2i.com.sg",
+    "website": "https://e2i.com.sg"
+  },
+  "walk_in_accepted": true,
+  "appointment_required": false,
+  "typical_processing_time": "Initial career coaching session: typically booked within 1-2 weeks. Place-and-Train placement: 4-12 weeks depending on sector.",
+  "last_updated": "2026-05-20",
+  "source_url": "https://e2i.com.sg"
+}

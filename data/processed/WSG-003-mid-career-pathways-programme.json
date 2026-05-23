@@ -1,0 +1,63 @@
+{
+  "service_id": "WSG-003",
+  "service_name": "Mid-Career Pathways Programme (MCPP)",
+  "agency": "WSG",
+  "location_type": "Physical_OTH",
+  "rich_description": "The Mid-Career Pathways Programme (MCPP) is a 4-to-6-month full-time job attachment scheme for Singapore citizens aged 40 and above who are actively looking for work. Participants are placed with public-sector or industry-leading host organisations to perform real work — not shadowing — and receive a monthly training allowance funded by WSG (up to $3,800 for non-graduate-equivalent attachments and up to $5,800 for graduate-equivalent attachments). The attachment is designed to rebuild recent work experience, refresh skills in a new sector, and give the participant a credible reference from a respected host — all of which materially improve prospects of permanent employment after the attachment ends. It is particularly suited to mature workers who have been out of work for several months, those whose previous industry has shrunk significantly, or those wanting to test a sector before committing to a full CCP conversion. Apply via MyCareersFuture (the WSG job portal) or through the WSG Careers Connect counter at OTH.",
+  "eligibility": {
+    "citizenship": [
+      "citizen"
+    ],
+    "age_min": 40,
+    "age_max": null,
+    "income_ceiling_monthly_sgd": null,
+    "employment_status": [
+      "unemployed",
+      "retrenched",
+      "underemployed"
+    ],
+    "other_criteria": [
+      "Singapore citizen aged 40+",
+      "Actively jobseeking (registered on MyCareersFuture)",
+      "Out of full-time employment, or in a role significantly below previous capacity",
+      "Selected and matched by WSG Careers Connect or paired Career Matching Provider to a host organisation"
+    ]
+  },
+  "required_documents": [
+    {
+      "name": "NRIC",
+      "required_if": null,
+      "notes": null
+    },
+    {
+      "name": "Resume",
+      "required_if": null,
+      "notes": "Used by Careers Connect coach to match to host organisations"
+    },
+    {
+      "name": "Last 3 months payslips or proof of unemployment",
+      "required_if": null,
+      "notes": null
+    },
+    {
+      "name": "Educational certificates",
+      "required_if": null,
+      "notes": "Determines graduate vs non-graduate attachment tier"
+    }
+  ],
+  "oth_location": "WSG Careers Connect at Tampines OTH (CareersFinder counter). Coaches run skills assessment and refer to MCPP host openings.",
+  "operating_hours": {
+    "mon-fri": "09:00-18:00",
+    "sat-sun": "closed"
+  },
+  "contact": {
+    "phone": "6883-5885",
+    "email": null,
+    "website": "https://www.wsg.gov.sg/home/career-individuals/employment-employability/mid-career-pathways-programme"
+  },
+  "walk_in_accepted": true,
+  "appointment_required": false,
+  "typical_processing_time": "From initial Careers Connect intake to host attachment offer: typically 4-8 weeks depending on sector availability.",
+  "last_updated": "2026-05-20",
+  "source_url": "https://www.wsg.gov.sg/home/career-individuals/employment-employability/mid-career-pathways-programme"
+}

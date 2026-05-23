@@ -1,0 +1,42 @@
+{
+  "service_id": "MOE-001",
+  "service_name": "MOE Financial Assistance Scheme (FAS)",
+  "agency": "MOE",
+  "rich_description": "The MOE Financial Assistance Scheme (FAS) covers school-related costs for Singapore citizen students from low-income families enrolled in government and government-aided schools — primary, secondary, junior college, and Millennia Institute. Recipients pay no school fees and receive free textbooks, free uniforms, free transport subsidies for those who live far from school, and free meals at the school's canteen via a meal subsidy of up to $3 a day. Independent schools have their own Independent School Bursary (ISB) with broader income brackets and higher quantum. There is also a separate Edusave Awards system that gives cash on top, but FAS is the means-tested baseline. Households qualify if gross monthly household income is at or below $3,000 OR per capita income is at or below $750. If your child is in school and these school-related costs are squeezing the household budget, this is the scheme — but the application has to be re-submitted yearly because income brackets are reviewed annually.",
+  "eligibility": {
+    "citizenship": ["citizen"],
+    "age_min": null,
+    "age_max": null,
+    "income_ceiling_monthly_sgd": 3000,
+    "employment_status": null,
+    "other_criteria": [
+      "Singapore citizen student enrolled in a government or government-aided school",
+      "Gross monthly household income at or below $3,000 OR per capita income at or below $750",
+      "Annual re-application required — eligibility is reviewed each calendar year",
+      "Independent school students apply for the Independent School Bursary (ISB) under broader income brackets",
+      "Special schools have a separate version administered by the school directly"
+    ]
+  },
+  "required_documents": [
+    {"name": "NRIC", "required_if": null, "notes": "For both parents and the student"},
+    {"name": "Income documents", "required_if": null, "notes": "Latest 3 months payslips or CPF contribution history for all working household members"},
+    {"name": "Income tax NOA", "required_if": "self-employed parent", "notes": null},
+    {"name": "No-income declaration", "required_if": "household member unemployed", "notes": "Standard MOE form"},
+    {"name": "Birth certificates of all household children", "required_if": null, "notes": "Used to calculate per capita income"}
+  ],
+  "oth_location": "Apply via the child's school directly — the General Office collects the form. Schools in the Tampines area include Tampines Primary, Tampines North Primary, Junyuan Primary, Tampines Secondary, and Temasek JC. PLACEHOLDER — verify whether ServiceSG counter at OTH can pre-screen for FAS eligibility.",
+  "operating_hours": {
+    "mon-fri": "08:00-16:00 (school General Office)",
+    "sat-sun": "closed"
+  },
+  "contact": {
+    "phone": "6872-2220",
+    "email": "contact@moe.gov.sg",
+    "website": "https://www.moe.gov.sg/financial-matters/financial-assistance"
+  },
+  "walk_in_accepted": true,
+  "appointment_required": false,
+  "typical_processing_time": "School submits to MOE; decision typically within 4-6 weeks. Benefits backdated to start of school term if approved.",
+  "last_updated": "2026-05-20",
+  "source_url": "https://www.moe.gov.sg/financial-matters/financial-assistance"
+}

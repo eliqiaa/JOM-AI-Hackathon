@@ -1,0 +1,66 @@
+{
+  "service_id": "WSG-004",
+  "service_name": "Career Trial",
+  "agency": "WSG",
+  "location_type": "Physical_OTH",
+  "rich_description": "Career Trial is a 1-to-3-month short-term job trial that lets jobseekers try out a new role before committing — and lets employers de-risk hiring someone whose resume doesn't perfectly match the job. The trialist is paid by the employer at a rate not lower than the agreed starting salary, and the trialist also receives a Retention Incentive from WSG (up to $1,500 for those under 40 and up to $2,500 for those 40+) if they convert to permanent employment after the trial. Trials cover both PMET and rank-and-file roles. This is well-suited to: someone unsure if they will enjoy a sector switch, a long-term unemployed jobseeker that employers are hesitant to hire directly, or a worker who recently completed a conversion course and wants real-world validation before signing a permanent contract. Trial openings are listed on MyCareersFuture; WSG Careers Connect coaches can shortlist relevant trials based on the jobseeker's profile.",
+  "eligibility": {
+    "citizenship": [
+      "citizen",
+      "PR"
+    ],
+    "age_min": 21,
+    "age_max": null,
+    "income_ceiling_monthly_sgd": null,
+    "employment_status": [
+      "unemployed",
+      "retrenched",
+      "underemployed",
+      "employed",
+      "self_employed"
+    ],
+    "other_criteria": [
+      "Singapore citizen or PR",
+      "Have not been employed by the trial employer in the last 6 months",
+      "Trial must be for a real job vacancy (not a project-based or short-term contract role)",
+      "Retention Incentive is paid only after the trialist converts to permanent employment for a sustained period"
+    ]
+  },
+  "required_documents": [
+    {
+      "name": "NRIC",
+      "required_if": null,
+      "notes": null
+    },
+    {
+      "name": "Resume",
+      "required_if": null,
+      "notes": null
+    },
+    {
+      "name": "Trial agreement",
+      "required_if": null,
+      "notes": "Signed by trialist, employer, and acknowledged by WSG"
+    },
+    {
+      "name": "Bank account details",
+      "required_if": "for receiving Retention Incentive",
+      "notes": null
+    }
+  ],
+  "oth_location": "WSG Careers Connect at Tampines OTH (CareersFinder counter). Coaches help write the trial pitch and broker the trial agreement with the employer.",
+  "operating_hours": {
+    "mon-fri": "09:00-18:00",
+    "sat-sun": "closed"
+  },
+  "contact": {
+    "phone": "6883-5885",
+    "email": null,
+    "website": "https://www.wsg.gov.sg/home/career-individuals/employment-employability/career-trial"
+  },
+  "walk_in_accepted": true,
+  "appointment_required": false,
+  "typical_processing_time": "Trial set-up: typically 2-4 weeks once a suitable opening is identified. Retention Incentive disbursed 3 months after conversion to permanent employment.",
+  "last_updated": "2026-05-20",
+  "source_url": "https://www.wsg.gov.sg/home/career-individuals/employment-employability/career-trial"
+}

@@ -1,0 +1,69 @@
+{
+  "service_id": "SSG-002",
+  "service_name": "Workfare Skills Support (WSS)",
+  "agency": "SSG",
+  "location_type": "Physical_OTH",
+  "rich_description": "Workfare Skills Support (WSS) is the training arm of the Workfare scheme, designed to help low-wage Singapore citizen workers upgrade their skills with minimal out-of-pocket cost. Eligible workers (income ≤ $2,500/month, citizen, aged 30+) receive (a) absentee payroll funding while attending approved courses, so they don't lose income for taking time off work, (b) up to 95% course-fee subsidy on SSG-approved courses on the SkillsFuture catalogue, and (c) a $200 training commitment cash award after completing a qualifying course. It also comes with a one-time SkillsFuture Credit (Mid-Career) top-up of $4,000 for workers aged 40+. WSS works alongside the Workfare Income Supplement (WIS) — the cash-and-CPF top-up paid quarterly to low-wage workers — but is a distinct programme focused on upskilling. If your household runs on a single low-wage breadwinner and they want to train into a better-paying role without losing the salary they currently bring in, this is the scheme designed for exactly that.",
+  "eligibility": {
+    "citizenship": [
+      "citizen"
+    ],
+    "age_min": 30,
+    "age_max": null,
+    "income_ceiling_monthly_sgd": 2500,
+    "employment_status": [
+      "employed",
+      "self_employed"
+    ],
+    "other_criteria": [
+      "Singapore citizen aged 30+",
+      "Monthly gross income at or below $2,500",
+      "Worked for at least 2 of the past 12 months (employed or self-employed)",
+      "Owns no more than one property; if married, household must not own more than 2 properties",
+      "Course must be on the SSG-approved SkillsFuture catalogue and aligned with the worker's Individual Learning Plan"
+    ]
+  },
+  "required_documents": [
+    {
+      "name": "NRIC",
+      "required_if": null,
+      "notes": null
+    },
+    {
+      "name": "Recent payslips or CPF contribution history",
+      "required_if": null,
+      "notes": "Demonstrates income ≤ $2,500/month"
+    },
+    {
+      "name": "Course registration confirmation",
+      "required_if": null,
+      "notes": "From the SSG-approved training provider"
+    },
+    {
+      "name": "Employer letter",
+      "required_if": "claiming absentee payroll",
+      "notes": "Confirms time off for training"
+    },
+    {
+      "name": "Income tax NOA",
+      "required_if": "self-employed",
+      "notes": null
+    }
+  ],
+  "oth_location": "Apply via MySkillsFuture portal. The ServiceSG counter at Tampines OTH and the WSG Careers Connect coaches can assist with login, course selection, and Workfare eligibility checks. PLACEHOLDER — verify whether ServiceSG counter at OTH handles WSS-specific enquiries.",
+  "operating_hours": {
+    "online": "24/7",
+    "mon-fri": "09:00-18:00 (ServiceSG / WSG Careers Connect at OTH)",
+    "sat-sun": "closed"
+  },
+  "contact": {
+    "phone": "6785-5785",
+    "email": null,
+    "website": "https://www.skillsfuture.gov.sg/initiatives/early-career/workfareskillssupport"
+  },
+  "walk_in_accepted": true,
+  "appointment_required": false,
+  "typical_processing_time": "Course-fee subsidy applied at point of enrolment. Absentee payroll claim reimbursed to worker (or employer) within 8-12 weeks of course completion. $200 training commitment award disbursed within 4 weeks of completion.",
+  "last_updated": "2026-05-20",
+  "source_url": "https://www.skillsfuture.gov.sg/initiatives/early-career/workfareskillssupport"
+}

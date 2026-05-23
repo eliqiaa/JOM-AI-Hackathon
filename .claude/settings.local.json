@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(.venv/Scripts/python.exe *)",
+      "Bash(curl -s -X POST http://127.0.0.1:8000/api/retrieve -H \"Content-Type: application/json\" -d '{\"query\":\"elderly mother stroke need help arranging care\",\"top_k\":3}')",
+      "Bash(python -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('confidence_low:', d['confidence_low']\\); [print\\(f\\\\\"  #{i+1} {s['service']['service_id']:10s} {s['service']['location_type']:16s} {s['service']['service_name']}\\\\\"\\) for i,s in enumerate\\(d['services']\\)]\")",
+      "PowerShell(Get-NetTCPConnection *)",
+      "PowerShell(Stop-Process *)",
+      "Bash(curl -s -o /dev/null -w \"GET /  %{http_code}\\\\n\" http://127.0.0.1:8000/)",
+      "Bash(curl -s -X POST http://127.0.0.1:8000/api/retrieve -H \"Content-Type: application/json\" -d '{\"query\":\"baby first vaccination Tampines\",\"top_k\":3}')",
+      "Bash(python -c \"import json,sys; d=json.load\\(sys.stdin\\); [print\\(f\\\\\"  #{i+1} {s['service']['service_id']:10s} {s['service']['service_name']}\\\\\"\\) for i,s in enumerate\\(d['services']\\)]\")",
+      "Bash(curl -s -X POST http://127.0.0.1:8000/api/retrieve -H \"Content-Type: application/json\" -d '{\"query\":\"My baby was just born last month and I need to book her first vaccinations. Also, how do I link her to my Singpass to get the Baby Bonus?\",\"top_k\":3}')",
+      "Bash(python -c \"import json,sys; d=json.load\\(sys.stdin\\); [print\\(f\\\\\"  #{i+1} {s['service']['service_id']:10s} {s['service']['location_type']:16s} {s['service']['service_name']}\\\\\"\\) for i,s in enumerate\\(d['services']\\)]\")",
+      "Bash(netstat -ano)",
+      "Bash(taskkill /F /PID 28528)",
+      "Bash(curl -s -X POST http://127.0.0.1:8001/api/retrieve -H \"Content-Type: application/json\" -d '{\"query\":\"low wage cleaner workfare income supplement payouts\",\"top_k\":3}')"
+    ]
+  }
+}

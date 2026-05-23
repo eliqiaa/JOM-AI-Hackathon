@@ -1,0 +1,41 @@
+{
+  "service_id": "IMH-001",
+  "service_name": "IMH Mental Health Helpline",
+  "agency": "IMH",
+  "rich_description": "The Institute of Mental Health (IMH) operates a 24-hour Mental Health Helpline at 6389-2222 that anyone in Singapore can call when they are worried about their own mental health or a loved one's. Trained mental health professionals assess the caller, give immediate practical advice, and connect callers to the most appropriate next step — IMH's outpatient clinic, the IMH Emergency Service (open 24/7 for acute psychiatric emergencies), a community mental health team via the Community Health Assessment Team (CHAT) for those aged 16-30, polyclinic mental health services, or a non-IMH community partner like the Samaritans (for emotional distress) or NAMS (for addiction-driven distress). The helpline is the right entry point for: feeling sad, low, hopeless, empty, or worthless for weeks or months at a time (depression); persistent severe anxiety, panic attacks, or fear that disables daily life; hearing voices, paranoid thoughts, or losing touch with reality; thinking about self-harm or suicide; bipolar mood swings; postpartum mental health concerns; or watching a relative refuse treatment but clearly deteriorate. Service is free; clinical follow-up at IMH or partner clinics is means-tested with MediShield, MediSave, and MediFund support available.",
+  "eligibility": {
+    "citizenship": ["citizen", "PR", "foreigner"],
+    "age_min": null,
+    "age_max": null,
+    "income_ceiling_monthly_sgd": null,
+    "employment_status": null,
+    "other_criteria": [
+      "Open to anyone in Singapore — helpline is free and anonymous",
+      "Clinical follow-up at IMH outpatient or community partners is subsidised for citizens and PRs; foreigners pay non-subsidised rates",
+      "24/7 helpline at 6389-2222; IMH Emergency Service at Buangkok Green is also open 24/7 for walk-in psychiatric emergencies",
+      "Concerned family member can call without the patient's consent"
+    ]
+  },
+  "required_documents": [
+    {"name": "None for the helpline", "required_if": null, "notes": "Anonymous calls accepted"},
+    {"name": "NRIC", "required_if": "registering at IMH outpatient clinic", "notes": null},
+    {"name": "Referral letter", "required_if": "if referred by polyclinic or GP", "notes": "Optional — self-referral accepted"},
+    {"name": "Income documents", "required_if": "applying for means-tested subsidy", "notes": null}
+  ],
+  "oth_location": "IMH operates from Buangkok Green (10 Buangkok View). CHAT (the youth-focused arm) runs satellite sessions at *SCAPE and select Polyclinics. PLACEHOLDER — verify whether IMH community outreach runs at Tampines Polyclinic or Tampines OTH.",
+  "operating_hours": {
+    "24-7": "Mental Health Helpline 6389-2222 and IMH Emergency Service at Buangkok Green",
+    "mon-fri": "08:00-17:00 (IMH outpatient clinic)",
+    "sat-sun": "closed (outpatient); helpline and Emergency Service always open"
+  },
+  "contact": {
+    "phone": "6389-2222",
+    "email": "contactus@imh.com.sg",
+    "website": "https://www.imh.com.sg/Patient-Care/For-Patients/Service-Information/Helpline"
+  },
+  "walk_in_accepted": false,
+  "appointment_required": true,
+  "typical_processing_time": "Helpline answered within minutes. First non-urgent outpatient appointment typically 2-6 weeks. Acute cases routed to IMH Emergency Service or admitted directly.",
+  "last_updated": "2026-05-20",
+  "source_url": "https://www.imh.com.sg/Patient-Care/For-Patients/Service-Information/Helpline"
+}

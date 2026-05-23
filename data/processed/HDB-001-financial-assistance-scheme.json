@@ -1,0 +1,76 @@
+{
+  "service_id": "HDB-001",
+  "service_name": "HDB Financial Assistance Scheme",
+  "agency": "HDB",
+  "location_type": "Physical_OTH",
+  "rich_description": "The HDB Financial Assistance Scheme helps flat owners who are struggling to keep up with their monthly mortgage instalments because of a sudden drop in income, job loss, retrenchment, illness, divorce, or other family hardship. Depending on the situation, HDB can defer instalments for a few months, restructure the loan to lower the monthly payment, allow a partial or full payment from CPF, or work out a customised repayment plan. The goal is to keep families in their flat instead of forcing a sale during a bad patch. Officers also coordinate with MSF or AIC if there are wider money, caregiving, or eldercare issues at the same time. If you are an HDB owner worried about losing your flat or already missing instalments, do not wait for the arrears letter — go down and talk to them.",
+  "eligibility": {
+    "citizenship": [
+      "citizen",
+      "PR"
+    ],
+    "age_min": 21,
+    "age_max": null,
+    "income_ceiling_monthly_sgd": null,
+    "employment_status": [
+      "unemployed",
+      "retrenched",
+      "underemployed",
+      "unable_to_work",
+      "employed"
+    ],
+    "other_criteria": [
+      "Must be an HDB flat owner with an HDB-issued mortgage loan",
+      "Demonstrated drop in household income or significant unexpected expenses",
+      "Have not previously defaulted without engagement"
+    ]
+  },
+  "required_documents": [
+    {
+      "name": "NRIC",
+      "required_if": null,
+      "notes": "For all flat owners on the lease"
+    },
+    {
+      "name": "HDB loan account statement",
+      "required_if": null,
+      "notes": "Most recent statement showing balance and any arrears"
+    },
+    {
+      "name": "Proof of income drop",
+      "required_if": "income has fallen",
+      "notes": "Recent payslips, CPF contribution history, or retrenchment letter"
+    },
+    {
+      "name": "Medical documents",
+      "required_if": "income drop due to illness",
+      "notes": null
+    },
+    {
+      "name": "Divorce or separation documents",
+      "required_if": "applicable",
+      "notes": null
+    },
+    {
+      "name": "List of monthly household expenses",
+      "required_if": null,
+      "notes": "Helps HDB design a feasible repayment plan"
+    }
+  ],
+  "oth_location": "Level 3, HDB Tampines Branch (Customer Service Counters)",
+  "operating_hours": {
+    "mon-fri": "08:00-17:00",
+    "sat": "08:00-13:00",
+    "sun": "closed"
+  },
+  "contact": {
+    "phone": "1800-225-5432",
+    "email": "hdbtampines@hdb.gov.sg",
+    "website": "https://www.hdb.gov.sg/residential/servicing-your-hdb-loan/financial-assistance-measures"
+  },
+  "walk_in_accepted": true,
+  "appointment_required": true,
+  "typical_processing_time": "Restructuring proposal within 2-4 weeks; emergency deferment can be approved within a few working days.",
+  "last_updated": "2026-05-20",
+  "source_url": "https://www.hdb.gov.sg/residential/servicing-your-hdb-loan/financial-assistance-measures"
+}

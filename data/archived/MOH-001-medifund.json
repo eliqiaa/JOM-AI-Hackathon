@@ -1,0 +1,41 @@
+{
+  "service_id": "MOH-001",
+  "service_name": "MediFund",
+  "agency": "MOH",
+  "rich_description": "MediFund is the safety-net medical endowment fund for Singapore citizens who, even after MediShield Life, government subsidies, MediSave, and family contributions, still cannot afford their hospital bill, polyclinic bill, or chronic-disease treatment fees. It is means-tested and assessed case-by-case by the MediFund Committee at each public healthcare institution, with the hospital's Medical Social Worker (MSW) doing the application and documentation on the patient's behalf. Typical situations: a large hospitalisation bill from a stroke, cancer treatment, dialysis, an ICU stay, or accumulated chronic-disease care that has wiped out CPF and MediSave. The amount granted depends on bill size, household income, remaining savings, and family ability to contribute. Speak to the hospital MSW before or at discharge — do not wait until the bills go to collections. Children under 18 can apply for the more generous MediFund Junior variant.",
+  "eligibility": {
+    "citizenship": ["citizen"],
+    "age_min": null,
+    "age_max": null,
+    "income_ceiling_monthly_sgd": null,
+    "employment_status": null,
+    "other_criteria": [
+      "Received subsidised treatment at a MediFund-affiliated public healthcare institution (hospital, polyclinic, ILTC)",
+      "Unable to pay the remaining bill after MediShield Life, government subsidies, MediSave, and family help",
+      "Assessed case-by-case by the hospital's MediFund Committee — no fixed income cut-off",
+      "Children under 18 are assessed under MediFund Junior"
+    ]
+  },
+  "required_documents": [
+    {"name": "NRIC", "required_if": null, "notes": "For applicant and household members"},
+    {"name": "Hospital bills and treatment summary", "required_if": null, "notes": "The bills MediFund is being asked to cover"},
+    {"name": "Proof of income or no-income", "required_if": null, "notes": "Payslips, CPF contribution history, or written declaration if unemployed"},
+    {"name": "Bank statements", "required_if": null, "notes": "Recent statements showing savings"},
+    {"name": "Family member contact information", "required_if": null, "notes": "MSW assesses whether family can reasonably contribute"}
+  ],
+  "oth_location": "Apply via the Medical Social Worker (MSW) at the hospital or polyclinic where treatment was received — there is no MediFund counter at OTH. Tampines's nearest public hospital is Changi General Hospital; its MSW department is on the hospital premises. PLACEHOLDER — verify CGH MSW department address.",
+  "operating_hours": {
+    "mon-fri": "08:30-17:30 (hospital MSW office, typical)",
+    "sat-sun": "closed (MSW office)"
+  },
+  "contact": {
+    "phone": null,
+    "email": null,
+    "website": "https://www.moh.gov.sg/healthcare-schemes-subsidies/medifund"
+  },
+  "walk_in_accepted": false,
+  "appointment_required": true,
+  "typical_processing_time": "MSW review and MediFund Committee decision typically 4-8 weeks. Emergency cases with imminent bill enforcement can be expedited.",
+  "last_updated": "2026-05-20",
+  "source_url": "https://www.moh.gov.sg/healthcare-schemes-subsidies/medifund"
+}

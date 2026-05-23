@@ -1,0 +1,45 @@
+{
+  "service_id": "MSF-004",
+  "service_name": "ChildCare and Infant Care Subsidies",
+  "agency": "ECDA",
+  "rich_description": "The ChildCare Subsidy (CCS) and Infant Care Subsidy (ICS) reduce the monthly fees that families pay at MSF-licensed childcare centres (for children 18 months to before age 7) and infant care centres (for children 2 to 18 months). Every Singapore citizen child gets a flat Basic Subsidy regardless of family income, but the much larger Additional Subsidy goes to families where the mother works at least 56 hours a month and gross monthly household income is at or below $12,000. The lower the income, the higher the subsidy — at the bottom income tier, families can pay as little as $3 a month for full-day childcare at an Anchor Operator centre. Non-working mothers also qualify for Basic Subsidy but at a much lower rate. The subsidy is applied directly at the centre — parents pay only the net fee. Tampines has many MSF-licensed preschools; if your child is a Singapore citizen and household income is tight, going to a Anchor Operator (PCF Sparkletots, My First Skool) centre maximises both the subsidy and the cap on monthly fees.",
+  "eligibility": {
+    "citizenship": ["citizen"],
+    "age_min": null,
+    "age_max": null,
+    "income_ceiling_monthly_sgd": 12000,
+    "employment_status": null,
+    "other_criteria": [
+      "Child must be a Singapore citizen aged 2-18 months (Infant Care) or 18 months to before age 7 (Childcare)",
+      "Child must be enrolled at an MSF-licensed centre",
+      "Working Mother definition: at least 56 working hours per month for Additional Subsidy",
+      "Additional Subsidy tiered by household income — maximum at gross monthly income ≤ $3,000, tapering until $12,000",
+      "Basic Subsidy paid to all Singapore citizen children regardless of mother's working status, but at a lower rate for non-working mothers"
+    ]
+  },
+  "required_documents": [
+    {"name": "NRIC", "required_if": null, "notes": "For both parents"},
+    {"name": "Child's birth certificate", "required_if": null, "notes": "To confirm citizenship and date of birth"},
+    {"name": "Mother's CPF contribution history", "required_if": null, "notes": "To verify working hours for Additional Subsidy"},
+    {"name": "Latest 3 months payslips (both parents)", "required_if": null, "notes": "To determine household income tier"},
+    {"name": "Income tax NOA", "required_if": "self-employed", "notes": null},
+    {"name": "Letter from employer", "required_if": "irregular working hours", "notes": "Confirms ≥ 56 hours/month"}
+  ],
+  "oth_location": "Apply via the LifeSG app or directly at the chosen MSF-licensed preschool — the centre submits on behalf of the family. ServiceSG counter at OTH can help with login if the family is unfamiliar with the app. PLACEHOLDER — verify ECDA enquiry counter presence at OTH.",
+  "operating_hours": {
+    "online": "24/7",
+    "mon-fri": "08:00-17:30 (centre office)",
+    "sat": "limited (varies by centre)",
+    "sun": "closed"
+  },
+  "contact": {
+    "phone": "1800-323-3313",
+    "email": "contact@ecda.gov.sg",
+    "website": "https://www.ecda.gov.sg/parents/subsidies-and-financial-assistance/preschool-subsidies"
+  },
+  "walk_in_accepted": true,
+  "appointment_required": false,
+  "typical_processing_time": "Subsidy approval typically 2-4 weeks from complete submission. Once approved, applied as a direct fee reduction from the following month onwards.",
+  "last_updated": "2026-05-20",
+  "source_url": "https://www.ecda.gov.sg/parents/subsidies-and-financial-assistance/preschool-subsidies"
+}

@@ -1,0 +1,40 @@
+{
+  "service_id": "MSF-008",
+  "service_name": "Child Protective Service (CPS)",
+  "agency": "MSF",
+  "rich_description": "The Child Protective Service (CPS) is MSF's investigative and protective response to child abuse, neglect, sexual abuse, and serious risk to a child's safety. Anyone who suspects a child is being abused or neglected — including teachers, neighbours, relatives, doctors, and the child themselves — can call the Child Protective Service Line (1800-777-0000) to report concerns. CPS officers (trained social workers with statutory powers under the Children and Young Persons Act) assess the situation, interview the child in a child-friendly setting, coordinate with police if criminal abuse is involved, work with MOH if medical examination is needed, and decide on the appropriate response — ranging from in-home family support, to short-term protective placement with a foster family or shelter, to court-ordered removal in the most severe cases. Reporting in good faith is protected by law and reporters can stay anonymous. CPS works closely with PAVE for cases that involve family violence affecting children, and with KidSTART for ongoing low-risk support of families needing parenting help.",
+  "eligibility": {
+    "citizenship": ["citizen", "PR", "foreigner"],
+    "age_min": null,
+    "age_max": 18,
+    "income_ceiling_monthly_sgd": null,
+    "employment_status": null,
+    "other_criteria": [
+      "Child must be under 18 (or under 21 if already under CPS supervision)",
+      "All children physically in Singapore are covered regardless of citizenship",
+      "Reporter can stay anonymous; reporting in good faith is legally protected",
+      "Self-referral by a child or young person is accepted — child does not need an adult to call"
+    ]
+  },
+  "required_documents": [
+    {"name": "None to report a concern", "required_if": null, "notes": "Phone the CPS Line — no documents needed"},
+    {"name": "Identifying details about the child", "required_if": null, "notes": "Name, age, school, address if known — but report even without if you only know the child's nickname"},
+    {"name": "Medical or police report", "required_if": "if one already exists", "notes": "Helps but is not required to make a report"}
+  ],
+  "oth_location": "Reports are made by phone — there is no walk-in counter at OTH for CPS reports. For non-emergency child welfare concerns, the Tampines Family Service Centre at OTH can advise and make a warm referral to CPS. PLACEHOLDER — verify whether ServiceSG OTH can route in-person walk-ins to CPS via phone.",
+  "operating_hours": {
+    "24-7": "Child Protective Service Line 1800-777-0000",
+    "mon-fri": "09:00-18:00 (case-officer follow-up)",
+    "sat-sun": "closed (case-officer); reports always accepted via the 24/7 line"
+  },
+  "contact": {
+    "phone": "1800-777-0000",
+    "email": "MSF_CPS@msf.gov.sg",
+    "website": "https://www.msf.gov.sg/our-services/families/child-protective-service"
+  },
+  "walk_in_accepted": false,
+  "appointment_required": false,
+  "typical_processing_time": "Initial triage: within hours of the report. On-site assessment: within 24-72 hours for medium-risk cases, immediately for high-risk. Imminent danger triggers same-day intervention with police.",
+  "last_updated": "2026-05-20",
+  "source_url": "https://www.msf.gov.sg/our-services/families/child-protective-service"
+}

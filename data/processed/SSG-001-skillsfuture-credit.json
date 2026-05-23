@@ -1,0 +1,49 @@
+{
+  "service_id": "SSG-001",
+  "service_name": "SkillsFuture Credit",
+  "agency": "SkillsFuture Singapore",
+  "location_type": "Physical_OTH",
+  "rich_description": "SkillsFuture Credit is a training subsidy account that every Singaporean aged 25 and above receives, which can be used to pay for thousands of approved courses ranging from digital and IT skills, food safety, accounting, healthcare assisting, languages, social media marketing, and many other vocational areas. The credit does not expire and can be combined with separate course-fee funding so the out-of-pocket cost is often very low or zero. At age 40, the credit gets a substantial top-up under the Mid-Career programme to encourage older workers to retrain. This is the main scheme for anyone who wants to learn a new skill, switch careers, future-proof their current job, or return to work after a long break — including retrenched workers, housewives, caregivers, and older Singaporeans facing tech change at work. Browse courses on MySkillsFuture.gov.sg with SingPass, pick one that fits, and pay with the credit at checkout.",
+  "eligibility": {
+    "citizenship": [
+      "citizen"
+    ],
+    "age_min": 25,
+    "age_max": null,
+    "income_ceiling_monthly_sgd": null,
+    "employment_status": null,
+    "other_criteria": [
+      "Singapore citizen aged 25 and above",
+      "No application required — credit is automatic in your SkillsFuture account",
+      "Mid-Career top-up automatic at age 40"
+    ]
+  },
+  "required_documents": [
+    {
+      "name": "NRIC",
+      "required_if": "in-person enquiry at WSG Careers Connect",
+      "notes": null
+    },
+    {
+      "name": "SingPass",
+      "required_if": null,
+      "notes": "Required to log into MySkillsFuture and use the credit at course checkout"
+    }
+  ],
+  "oth_location": "Online via MySkillsFuture.gov.sg. For course-and-career advice in person, walk over to Level 5, WSG Careers Connect @ Tampines, which is in OTH. PLACEHOLDER — confirm whether SSG itself has a Tampines counter; current understanding is no.",
+  "operating_hours": {
+    "online": "24/7",
+    "mon-fri": "09:00-18:00 (WSG Careers Connect for advice)",
+    "sat-sun": "closed (WSG Careers Connect)"
+  },
+  "contact": {
+    "phone": "6785-5785",
+    "email": null,
+    "website": "https://www.myskillsfuture.gov.sg/content/portal/en/index.html"
+  },
+  "walk_in_accepted": false,
+  "appointment_required": false,
+  "typical_processing_time": "Instant — credit applies at course checkout on MySkillsFuture.",
+  "last_updated": "2026-05-20",
+  "source_url": "https://www.skillsfuture.gov.sg/credit"
+}

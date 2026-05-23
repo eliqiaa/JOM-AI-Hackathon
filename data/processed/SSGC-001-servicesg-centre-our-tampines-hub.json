@@ -1,0 +1,41 @@
+{
+  "service_id": "SSGC-001",
+  "service_name": "ServiceSG Centre @ Our Tampines Hub",
+  "agency": "ServiceSG (Public Service Division, PMO)",
+  "location_type": "Physical_OTH",
+  "rich_description": "ServiceSG Centre @ Our Tampines Hub is a one-stop physical helpdesk where residents — including new parents, seniors, and anyone uncomfortable with online services — can walk in and get a real person to help them navigate digital government services. Trained officers can sit with you and help you set up SingPass, recover a SingPass account, link a newborn or child to your SingPass / LifeSG account (child SingPass linking), use MyInfo, and complete online applications across multiple agencies in one place: the Baby Bonus Scheme including Cash Gift enrolment and Child Development Account (CDA) opening, AIC schemes such as Home Caregiving Grant or Seniors' Mobility and Enabling Fund, HDB online services, CPF self-service, IRAS tax filing, ICA renewals, MOH and HealthHub matters, Silver Support, ComCare e-applications, MyCareersFuture, LifeSG transactions, and many more. They will not approve or process applications themselves — those still go to the owning agency — but they will help you submit the right thing correctly so it does not get rejected. If a service in your search results is tagged Digital_Hotline (no OTH counter), this is the place to go for in-person help with the online application. Especially useful for new parents enrolling a newborn for Baby Bonus, caregivers managing eldercare applications, elderly residents, low-digital-literacy users, and anyone who finds online government services overwhelming. Walk-in welcome; no appointment needed for general assistance, though some specialised sessions may require booking.",
+  "eligibility": {
+    "citizenship": ["citizen", "PR", "foreigner"],
+    "age_min": null,
+    "age_max": null,
+    "income_ceiling_monthly_sgd": null,
+    "employment_status": null,
+    "other_criteria": [
+      "Open to all residents who need help with any digital government service",
+      "Especially helpful for seniors, caregivers, and digitally less-confident users",
+      "Officers assist with submission only — approval decisions remain with the owning agency (AIC, HDB, CPF, etc.)"
+    ]
+  },
+  "required_documents": [
+    {"name": "NRIC / FIN / passport", "required_if": null, "notes": "For identification"},
+    {"name": "SingPass", "required_if": "submitting an application that requires SingPass login", "notes": "Officers can help you set up or recover SingPass if you do not have it"},
+    {"name": "Supporting documents", "required_if": "submitting a specific application", "notes": "Bring whatever the underlying scheme requires (e.g. income documents for HCG, medical reports for SMF)"}
+  ],
+  "oth_location": "Level 1, ServiceSG Centre @ Our Tampines Hub (1 Tampines Walk, Singapore 528523). [VERIFY] exact unit number with OTH directory.",
+  "operating_hours": {
+    "mon-fri": "08:00-19:00 [VERIFY]",
+    "sat": "08:00-13:00 [VERIFY]",
+    "sun": "closed",
+    "public_holidays": "closed"
+  },
+  "contact": {
+    "phone": "1800-225-5582 (ServiceSG hotline)",
+    "email": null,
+    "website": "https://www.life.gov.sg/servicesg"
+  },
+  "walk_in_accepted": true,
+  "appointment_required": false,
+  "typical_processing_time": "Most enquiries handled the same visit. Complex applications (multiple supporting documents, agency follow-ups) may take a longer single session or a return visit.",
+  "last_updated": "2026-05-23",
+  "source_url": "https://www.life.gov.sg/servicesg"
+}

@@ -1,0 +1,71 @@
+{
+  "service_id": "WSG-002",
+  "service_name": "Career Conversion Programme (CCP)",
+  "agency": "WSG",
+  "location_type": "Physical_OTH",
+  "rich_description": "The Career Conversion Programme (CCP) is Workforce Singapore's flagship mid-career switch scheme. Participating employers hire mid-career individuals into roles they would not normally qualify for on paper, then put them through 3-12 months of structured on-the-job and classroom training to bring them up to speed. Throughout the training period, WSG reimburses the employer up to 70% of the trainee's monthly salary (90% for mature workers aged 40+, ex-offenders, persons with disabilities, and long-term unemployed). The trainee draws a normal salary from day one — this is not a stipend or scholarship. CCPs run across roughly 30 growth sectors including infocomm, healthcare, advanced manufacturing, professional services, financial services, and the green economy. Suited to: someone retrenched from a shrinking sector, a homemaker returning to work, a mid-career professional whose previous skills are obsolete. You don't apply to WSG directly — you apply to a CCP-listed job opening at a participating employer, and the conversion package kicks in on hire.",
+  "eligibility": {
+    "citizenship": [
+      "citizen",
+      "PR"
+    ],
+    "age_min": 21,
+    "age_max": null,
+    "income_ceiling_monthly_sgd": null,
+    "employment_status": [
+      "unemployed",
+      "retrenched",
+      "underemployed",
+      "employed",
+      "self_employed"
+    ],
+    "other_criteria": [
+      "Singapore citizen or PR",
+      "Hired by a CCP-participating employer into a new role under the programme",
+      "Have not received CCP support for the same job role at the same company before",
+      "Mature workers 40+, long-term unemployed (6+ months), ex-offenders, and persons with disabilities qualify for higher 90% salary support tier"
+    ]
+  },
+  "required_documents": [
+    {
+      "name": "NRIC",
+      "required_if": null,
+      "notes": "For the trainee"
+    },
+    {
+      "name": "Resume or work history",
+      "required_if": null,
+      "notes": "Used by the employer to assess the conversion plan"
+    },
+    {
+      "name": "Educational certificates",
+      "required_if": "if relevant to the new role",
+      "notes": null
+    },
+    {
+      "name": "Last drawn payslip or income tax NOA",
+      "required_if": null,
+      "notes": "To benchmark training-period salary"
+    },
+    {
+      "name": "Employment letter or offer letter",
+      "required_if": null,
+      "notes": "Issued by the participating employer"
+    }
+  ],
+  "oth_location": "WSG Careers Connect at Tampines OTH (CareersFinder counter). Officers help match jobseekers to CCP-listed openings and can refer to the WSG-paired Career Matching Provider for the sector.",
+  "operating_hours": {
+    "mon-fri": "09:00-18:00",
+    "sat-sun": "closed"
+  },
+  "contact": {
+    "phone": "6883-5885",
+    "email": null,
+    "website": "https://www.wsg.gov.sg/home/career-individuals/employment-employability/career-conversion-programmes"
+  },
+  "walk_in_accepted": true,
+  "appointment_required": false,
+  "typical_processing_time": "Job matching and interview timeline depends on the employer; CCP approval is bundled into the hire — once the offer is accepted the training package starts immediately.",
+  "last_updated": "2026-05-20",
+  "source_url": "https://www.wsg.gov.sg/home/career-individuals/employment-employability/career-conversion-programmes"
+}

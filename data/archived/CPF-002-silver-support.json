@@ -1,0 +1,39 @@
+{
+  "service_id": "CPF-002",
+  "service_name": "Silver Support Scheme",
+  "agency": "CPF Board",
+  "rich_description": "Silver Support is a quarterly cash payout from the government for elderly Singaporeans aged 65 and above who had low incomes through their working years, accumulated little CPF savings, and live in smaller HDB flats. It is automatic — there is no application form — and is meant as a supplement on top of family support and personal savings, not a replacement for either. Payments arrive every three months in January, April, July, and October, sent to your bank account or PayNow. Common recipients are retired cleaners, hawkers, taxi drivers, factory workers, and people who spent decades caregiving without paid work. If your elderly parent is wondering whether they qualify, whether the amount is correct, or whether they need to do anything, they can check via the Silver Support portal with SingPass or visit a CPF Service Centre. This is one of the main pillars of retirement support for low-income seniors.",
+  "eligibility": {
+    "citizenship": ["citizen"],
+    "age_min": 65,
+    "age_max": null,
+    "income_ceiling_monthly_sgd": null,
+    "employment_status": null,
+    "other_criteria": [
+      "Aged 65 and above",
+      "Total CPF contributions through working years below the Silver Support threshold",
+      "Lives in a 1-room to 5-room HDB flat (not Executive flat or private property)",
+      "Monthly household income per person below the Silver Support cut-off (assessed annually)"
+    ]
+  },
+  "required_documents": [
+    {"name": "NRIC", "required_if": "checking status in person", "notes": "Most recipients do not need to submit anything — enrolment is automatic"},
+    {"name": "SingPass", "required_if": "checking status online", "notes": "For Silver Support portal login"}
+  ],
+  "oth_location": "Online via cpf.gov.sg/silversupport; no dedicated counter at OTH. Nearest physical CPF Service Centre: Tampines CPF Service Centre (approx. 10 minutes from OTH). PLACEHOLDER — verify address before demo.",
+  "operating_hours": {
+    "online": "24/7",
+    "mon-fri": "08:00-17:30 (CPF Service Centre)",
+    "sat-sun": "closed (CPF Service Centre)"
+  },
+  "contact": {
+    "phone": "1800-227-1188",
+    "email": null,
+    "website": "https://www.cpf.gov.sg/member/schemes/schemes/retirement/silver-support-scheme"
+  },
+  "walk_in_accepted": false,
+  "appointment_required": false,
+  "typical_processing_time": "Automatic quarterly payouts (Jan, Apr, Jul, Oct) if eligible. Eligibility reassessed annually based on the latest year's data.",
+  "last_updated": "2026-05-20",
+  "source_url": "https://www.cpf.gov.sg/member/schemes/schemes/retirement/silver-support-scheme"
+}

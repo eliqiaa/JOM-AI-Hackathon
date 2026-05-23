@@ -1,0 +1,45 @@
+{
+  "service_id": "AIC-002",
+  "service_name": "Home Caregiving Grant (HCG)",
+  "agency": "Agency for Integrated Care",
+  "location_type": "Digital_Hotline",
+  "rich_description": "Home Caregiving Grant (HCG) is a recurring cash payout that helps families defray the cost of caring at home for a Singaporean or PR who needs permanent help with at least three Activities of Daily Living (ADLs) such as bathing, dressing, feeding, transferring, toileting, or moving around. Strictly for permanent severe disability or frailty in adults — NOT for newborn, infant, or routine child healthcare. Typical care recipients are stroke survivors, persons with advanced dementia, adults with severe disability, or seniors at end-stage frailty. The grant is paid to the caregiver's bank account, and the amount is tiered by household per-capita income — lower income receives the higher tier. It is deliberately flexible: families can use it to pay for a domestic helper, transport to medical appointments, adult diapers, mobility aids, or to ease the financial pressure of someone in the household giving up paid work to provide the care. The application is submitted online and routes through a Functional Assessment Report issued by a doctor, AIC-appointed assessor, or hospital Medical Social Worker, who can also submit the application during discharge planning.",
+  "eligibility": {
+    "citizenship": ["citizen", "PR"],
+    "age_min": null,
+    "age_max": null,
+    "income_ceiling_monthly_sgd": 3600,
+    "employment_status": null,
+    "other_criteria": [
+      "Care recipient is a Singapore citizen or PR",
+      "Care recipient needs permanent help with at least 3 Activities of Daily Living (ADLs)",
+      "Cared for at home, not in residential care",
+      "Functional assessment certifies the ADL needs",
+      "Household monthly per-capita income below the HCG ceiling (higher tier for lower income)",
+      "For in-person help submitting the online application, walk in to ServiceSG @ OTH Level 1"
+    ]
+  },
+  "required_documents": [
+    {"name": "NRIC", "required_if": null, "notes": "For both care recipient and caregiver"},
+    {"name": "Functional Assessment Report", "required_if": null, "notes": "Issued by a doctor, AIC-appointed assessor, or hospital MSW; confirms 3 or more ADLs needing help"},
+    {"name": "Proof of household income", "required_if": null, "notes": "Payslips, CPF contribution history, or income tax statements for all working household members"},
+    {"name": "Bank account details", "required_if": null, "notes": "Caregiver's account for payout transfer"}
+  ],
+  "oth_location": "No AIC counter at Our Tampines Hub. Apply online at aic.sg with SingPass. For in-person help with SingPass or the online form, walk in to the ServiceSG Centre at OTH Level 1 (see SSGC-001).",
+  "operating_hours": {
+    "online": "24/7",
+    "mon-fri": "08:30-20:30 (careline 1800-650-6060)",
+    "sat": "08:30-16:00 (careline)",
+    "sun": "closed (careline)"
+  },
+  "contact": {
+    "phone": "1800-650-6060",
+    "email": "enquiries@aic.sg",
+    "website": "https://www.aic.sg/financial-assistance/home-caregiving-grant"
+  },
+  "walk_in_accepted": false,
+  "appointment_required": false,
+  "typical_processing_time": "Functional assessment plus paperwork review approximately 4-6 weeks from submission. Payouts start the month after approval and are typically backdated to the application month.",
+  "last_updated": "2026-05-23",
+  "source_url": "https://www.aic.sg/financial-assistance/home-caregiving-grant"
+}

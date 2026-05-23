@@ -1,0 +1,41 @@
+{
+  "service_id": "PAVE-001",
+  "service_name": "PAVE Integrated Services for Family Violence",
+  "agency": "PAVE",
+  "rich_description": "PAVE (Promoting Alternatives to Violence) is one of three MSF-appointed Family Violence Specialist Centres in Singapore, serving the eastern region including Tampines. It is the right place for anyone affected by family violence — including a wife or girlfriend whose husband or partner hits, beats, slaps, chokes, or threatens her; a husband whose wife is abusive; a child or teenager scared of a parent's beatings or shouting; elderly parents being slapped or financially abused by adult children; and perpetrators who want to stop hurting their family. Casework is confidential. PAVE provides safety planning, emergency shelter referrals (to crisis shelters operated by MSF), help applying for a Personal Protection Order (PPO) or Domestic Exclusion Order at the Family Justice Courts, ongoing counselling for survivors and children who witnessed the violence, and rehabilitation counselling for abusers (mandated and voluntary). Walk-ins are welcomed but if the situation is acutely dangerous — being assaulted right now, weapons in the home, death threats from an abuser — call the 24-hour National Anti-Violence and Sexual Harassment Helpline at 1800-777-0000 first or dial 999 for police. PAVE accepts everyone regardless of citizenship or income; there is no fee for first-line crisis services.",
+  "eligibility": {
+    "citizenship": ["citizen", "PR", "foreigner"],
+    "age_min": null,
+    "age_max": null,
+    "income_ceiling_monthly_sgd": null,
+    "employment_status": null,
+    "other_criteria": [
+      "Open to anyone affected by family violence: survivors, perpetrators, children who witnessed violence",
+      "No citizenship or income restriction — foreigner spouses and migrant domestic workers explicitly served",
+      "Acute danger: call 1800-777-0000 (National Anti-Violence and Sexual Harassment Helpline) or 999 (police) first",
+      "PPO / Domestic Exclusion Order legal help is bundled with casework"
+    ]
+  },
+  "required_documents": [
+    {"name": "NRIC / FIN / passport", "required_if": null, "notes": "Whatever ID is available; PAVE will help if you have nothing"},
+    {"name": "Police report", "required_if": "if one has been made", "notes": "Strengthens PPO application — not required to start casework"},
+    {"name": "Medical report", "required_if": "if there are physical injuries", "notes": "From a polyclinic or hospital A&E"},
+    {"name": "Photos of injuries / property damage", "required_if": "if available", "notes": null}
+  ],
+  "oth_location": "PAVE's main centre is at Block 211 Ang Mo Kio Ave 3 (covering all regions). Eastern-region casework is also handled via Tampines Family Service Centre referrals. PLACEHOLDER — verify whether PAVE has a satellite presence at Tampines OTH.",
+  "operating_hours": {
+    "mon-fri": "09:00-18:00 (office)",
+    "sat": "09:00-13:00 (by appointment)",
+    "sun": "closed (office); 24/7 National Anti-Violence helpline available"
+  },
+  "contact": {
+    "phone": "1800-777-0000",
+    "email": "contactus@pave.org.sg",
+    "website": "https://pave.org.sg"
+  },
+  "walk_in_accepted": true,
+  "appointment_required": false,
+  "typical_processing_time": "Same-day for crisis intake. PPO court application typically heard within 2-4 weeks of filing; interim Expedited Order can be granted within days for high-risk cases.",
+  "last_updated": "2026-05-20",
+  "source_url": "https://pave.org.sg"
+}

@@ -1,0 +1,37 @@
+{
+  "service_id": "MOH-003",
+  "service_name": "Merdeka Generation Package",
+  "agency": "MOH",
+  "rich_description": "The Merdeka Generation Package is the medical-subsidies and benefits scheme for Singapore citizens born between 1 January 1950 and 31 December 1959 who became citizens on or before 31 December 1996, recognising their contribution to Singapore's growth years. Benefits are smaller than Pioneer Generation's but still substantial: higher outpatient subsidies at polyclinics and CHAS GP and dentist clinics, MediShield Life premium subsidies (partial coverage), MediSave top-ups, and CareShield Life participation incentives. Like Pioneer Generation, enrolment is automatic and the Merdeka Generation card is issued. If your parent or relative is in their mid-60s to mid-70s and has been a citizen since before 1996, they are very likely on the Merdeka scheme rather than Pioneer. Subsidies apply at CHAS-participating clinics islandwide and at all public polyclinics and hospitals.",
+  "eligibility": {
+    "citizenship": ["citizen"],
+    "age_min": 66,
+    "age_max": 76,
+    "income_ceiling_monthly_sgd": null,
+    "employment_status": null,
+    "other_criteria": [
+      "Born between 1 January 1950 and 31 December 1959",
+      "Obtained Singapore citizenship on or before 31 December 1996",
+      "Merdeka Generation card issued automatically — no application required"
+    ]
+  },
+  "required_documents": [
+    {"name": "NRIC", "required_if": null, "notes": "Card issued automatically — physical card is mailed"}
+  ],
+  "oth_location": "Online via LifeSG app or gov.sg/merdeka; CPF Service Centres and Community Centres assist with enquiries. PLACEHOLDER — verify whether ServiceSG counter at Tampines OTH handles Merdeka Generation enquiries.",
+  "operating_hours": {
+    "online": "24/7",
+    "mon-fri": "08:00-17:30 (CPF Service Centre)",
+    "sat-sun": "closed (CPF Service Centre)"
+  },
+  "contact": {
+    "phone": "1800-2222-888",
+    "email": null,
+    "website": "https://www.moh.gov.sg/healthcare-schemes-subsidies/merdeka-generation"
+  },
+  "walk_in_accepted": false,
+  "appointment_required": false,
+  "typical_processing_time": "Automatic — subsidies apply immediately at every clinic visit.",
+  "last_updated": "2026-05-20",
+  "source_url": "https://www.moh.gov.sg/healthcare-schemes-subsidies/merdeka-generation"
+}

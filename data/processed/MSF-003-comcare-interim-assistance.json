@@ -1,0 +1,55 @@
+{
+  "service_id": "MSF-003",
+  "service_name": "ComCare Interim Assistance",
+  "agency": "MSF",
+  "location_type": "Physical_OTH",
+  "rich_description": "ComCare Interim Assistance is the urgent same-day cash help that Social Service Officers can authorise at the Tampines SSO when a household walks in facing a sudden crisis — eviction notice, utilities cut, no money for food today, or an emergency medical bill that cannot wait. It is designed to bridge the gap while a fuller ComCare Short-to-Medium-Term application is being assessed, so a family does not fall through the cracks in the two weeks that the main assessment may take. The form of help is matched to the immediate need: cash, NTUC FairPrice food vouchers, utility account credit, or rent arrears support. If you cannot wait two weeks because the situation is acute right now, you can just walk in to the SSO and speak to an officer; bring NRIC and any letter showing the urgency. This is the cannot-wait door.",
+  "eligibility": {
+    "citizenship": [
+      "citizen",
+      "PR"
+    ],
+    "age_min": 21,
+    "age_max": null,
+    "income_ceiling_monthly_sgd": 1900,
+    "employment_status": null,
+    "other_criteria": [
+      "Household is in immediate financial distress (eviction, utilities cut, no food, urgent medical)",
+      "Awaiting full ComCare assessment or unable to wait for it",
+      "Little or no immediate family support available"
+    ]
+  },
+  "required_documents": [
+    {
+      "name": "NRIC",
+      "required_if": null,
+      "notes": "Other documents can be brought later — interim help is not gated on paperwork"
+    },
+    {
+      "name": "Urgency letter or evidence",
+      "required_if": null,
+      "notes": "e.g. eviction notice from HDB, utilities disconnection notice, hospital bill"
+    },
+    {
+      "name": "Proof of income drop",
+      "required_if": "income recently fell",
+      "notes": "Helps the officer size the interim amount"
+    }
+  ],
+  "oth_location": "Level 1, Social Service Office (Tampines SSO)",
+  "operating_hours": {
+    "mon-thu": "08:30-18:00",
+    "fri": "08:30-17:30",
+    "sat-sun": "closed"
+  },
+  "contact": {
+    "phone": "1800-222-0000",
+    "email": null,
+    "website": "https://www.msf.gov.sg/what-we-do/comcare/Pages/ComCare-Interim-Assistance.aspx"
+  },
+  "walk_in_accepted": true,
+  "appointment_required": false,
+  "typical_processing_time": "Same-day decision in most cases; vouchers or transfer within a few hours of walk-in.",
+  "last_updated": "2026-05-20",
+  "source_url": "https://www.msf.gov.sg/what-we-do/comcare/Pages/ComCare-Interim-Assistance.aspx"
+}

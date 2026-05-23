@@ -1,0 +1,40 @@
+{
+  "service_id": "MSF-005",
+  "service_name": "KidSTART",
+  "agency": "ECDA",
+  "rich_description": "KidSTART is a holistic upstream support programme for low-income Singapore citizen families with children aged 0 to 6, designed to give vulnerable children a strong start in life. A KidSTART Practitioner — a trained social worker or early childhood professional — visits the family at home regularly to support healthy development, school-readiness, parenting confidence, and connections to medical, financial, and preschool services. Families also receive structured group sessions for parents (covering topics like nutrition, child play, and managing money), and direct help enrolling children into preschool with maximised subsidies. KidSTART is intentionally holistic: the practitioner is the family's stable point of contact who can pull in ComCare for cash assistance, MSW for housing issues, HCG for caregiving, or refer to MOE for school-related help. This is the right scheme when a family is overwhelmed and needs one trusted person walking alongside them, not a stack of unrelated forms.",
+  "eligibility": {
+    "citizenship": ["citizen"],
+    "age_min": null,
+    "age_max": null,
+    "income_ceiling_monthly_sgd": 2500,
+    "employment_status": null,
+    "other_criteria": [
+      "Singapore citizen child aged 0-6 (prenatal also accepted)",
+      "Household monthly gross income at or below $2,500 OR per capita income ≤ $650",
+      "Referred by hospital MSW, Family Service Centre, polyclinic, ComCare officer, or preschool",
+      "Family commits to home visits and group sessions over a multi-year engagement"
+    ]
+  },
+  "required_documents": [
+    {"name": "NRIC", "required_if": null, "notes": "For both parents"},
+    {"name": "Child's birth certificate", "required_if": null, "notes": null},
+    {"name": "Income documents", "required_if": null, "notes": "Payslips or written declaration; CPF contribution history if available"},
+    {"name": "Referral form", "required_if": null, "notes": "From the referring MSW / FSC / preschool"}
+  ],
+  "oth_location": "Refer via the Family Service Centre at Tampines OTH or through any hospital MSW, polyclinic, or preschool. KidSTART staff conduct home visits — there is no walk-in counter. PLACEHOLDER — verify whether Tampines FSC at OTH carries KidSTART intake responsibilities.",
+  "operating_hours": {
+    "mon-fri": "09:00-18:00 (referring agencies)",
+    "sat-sun": "closed (referring agencies); home visits scheduled flexibly with family"
+  },
+  "contact": {
+    "phone": "1800-323-3313",
+    "email": "contact@kidstart.sg",
+    "website": "https://www.kidstart.gov.sg"
+  },
+  "walk_in_accepted": false,
+  "appointment_required": true,
+  "typical_processing_time": "Intake assessment within 2-4 weeks of referral. Engagement runs continuously through the child's 0-6 years with regular home visits.",
+  "last_updated": "2026-05-20",
+  "source_url": "https://www.kidstart.gov.sg"
+}

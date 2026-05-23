@@ -1,0 +1,40 @@
+{
+  "service_id": "CPF-001",
+  "service_name": "Workfare Income Supplement (WIS)",
+  "agency": "CPF Board",
+  "rich_description": "Workfare Income Supplement is a yearly top-up paid by the government to lower-wage Singaporean workers, both employees and self-employed, to reward them for working and to boost their CPF retirement savings at the same time. Part of the payout goes into your CPF account and part into your bank account or PayNow. Employees do not need to apply — CPF Board pays you automatically once your employer's CPF contributions for the year are in. Self-employed persons such as hawker assistants, private hire drivers, or delivery riders need to declare their income to IRAS and make MediSave contributions to qualify. It is most relevant for cleaners, security officers, dishwashers, food delivery riders, hawker stall workers, and similar lower-wage roles, especially workers above 30. If you are already working but the pay is low and you want to know whether the government tops you up automatically, this is the scheme to check.",
+  "eligibility": {
+    "citizenship": ["citizen"],
+    "age_min": 21,
+    "age_max": null,
+    "income_ceiling_monthly_sgd": 2500,
+    "employment_status": ["employed", "self_employed"],
+    "other_criteria": [
+      "Working — employee with CPF contributions OR self-employed with declared income and MediSave contributions",
+      "Full benefit from age 30; younger workers eligible if they have a disability",
+      "Lives in an HDB flat with annual value below the Workfare threshold",
+      "Owns no more than one property"
+    ]
+  },
+  "required_documents": [
+    {"name": "NRIC", "required_if": null, "notes": "Only needed for in-person enquiry; employees are paid automatically"},
+    {"name": "IRAS income declaration", "required_if": "self-employed", "notes": "Declare income for the previous year via myTaxPortal"},
+    {"name": "MediSave contribution receipt", "required_if": "self-employed", "notes": "Contribute the required MediSave amount before WIS is paid"}
+  ],
+  "oth_location": "Online application via cpf.gov.sg; no dedicated counter at OTH. Nearest physical CPF Service Centre: Tampines CPF Service Centre (approx. 10 minutes from OTH). PLACEHOLDER — verify Tampines CPF SC address before demo.",
+  "operating_hours": {
+    "online": "24/7",
+    "mon-fri": "08:00-17:30 (CPF Service Centre)",
+    "sat-sun": "closed (CPF Service Centre)"
+  },
+  "contact": {
+    "phone": "1800-227-1188",
+    "email": null,
+    "website": "https://www.cpf.gov.sg/member/schemes/schemes/other-matters/workfare-income-supplement"
+  },
+  "walk_in_accepted": false,
+  "appointment_required": false,
+  "typical_processing_time": "Employees: automatic monthly payouts the following year after CPF contributions are processed. Self-employed: paid after IRAS income declaration and MediSave top-up clear (typically Mar-Apr the following year).",
+  "last_updated": "2026-05-20",
+  "source_url": "https://www.cpf.gov.sg/member/schemes/schemes/other-matters/workfare-income-supplement"
+}

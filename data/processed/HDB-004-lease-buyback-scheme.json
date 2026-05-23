@@ -1,0 +1,66 @@
+{
+  "service_id": "HDB-004",
+  "service_name": "Lease Buyback Scheme",
+  "agency": "HDB",
+  "location_type": "Physical_OTH",
+  "rich_description": "The Lease Buyback Scheme lets elderly HDB flat owners aged 65 and above sell the tail-end of their flat's lease back to HDB while continuing to live in the flat for a retained lease of 15 to 35 years. The proceeds are used to top up the household's CPF Retirement Account, which then pays out a monthly income for life via CPF LIFE — turning an illiquid flat into a steady retirement income stream without forcing the senior to move out. There is also a cash bonus of up to $30,000 paid in cash on top of the CPF top-up. This is meant for asset-rich-but-cash-poor seniors whose flat is their main asset and who need retirement income but want to age in place. Available for 3-room and smaller flats by default; 4-room owners are eligible if monthly household income is at or below $14,000. If your elderly parent owns a smaller flat in Tampines, has limited savings, and worries about running out of money in old age, this scheme converts the flat into lifetime monthly income without selling and moving.",
+  "eligibility": {
+    "citizenship": [
+      "citizen"
+    ],
+    "age_min": 65,
+    "age_max": null,
+    "income_ceiling_monthly_sgd": 14000,
+    "employment_status": null,
+    "other_criteria": [
+      "At least one owner must be a Singapore citizen aged 65+",
+      "Own a 3-room or smaller HDB flat (4-room eligible if household income ≤ $14,000/month)",
+      "Flat must have at least 20 years of lease remaining",
+      "Applicant and spouse must not own any other property in Singapore or overseas",
+      "Household must commit to retain at least 15 years of lease"
+    ]
+  },
+  "required_documents": [
+    {
+      "name": "NRIC",
+      "required_if": null,
+      "notes": "For all flat owners"
+    },
+    {
+      "name": "Flat ownership documents",
+      "required_if": null,
+      "notes": "Title deed or HDB ownership confirmation"
+    },
+    {
+      "name": "CPF statements",
+      "required_if": null,
+      "notes": "Most recent CPF Retirement Account statement"
+    },
+    {
+      "name": "Income documents",
+      "required_if": "applying for 4-room flat",
+      "notes": "To verify household income ≤ $14,000/month"
+    },
+    {
+      "name": "Marriage / divorce / death certificate",
+      "required_if": "applicable",
+      "notes": null
+    }
+  ],
+  "oth_location": "Level 3, HDB Tampines Branch (Customer Service Counters). HDB officers walk seniors through the financial projection and required CPF top-up before signing.",
+  "operating_hours": {
+    "mon-fri": "08:00-17:00",
+    "sat": "08:00-13:00",
+    "sun": "closed"
+  },
+  "contact": {
+    "phone": "1800-225-5432",
+    "email": "hdbtampines@hdb.gov.sg",
+    "website": "https://www.hdb.gov.sg/residential/living-in-an-hdb-flat/for-our-seniors/lease-buyback-scheme"
+  },
+  "walk_in_accepted": true,
+  "appointment_required": true,
+  "typical_processing_time": "From application to completion typically 3-4 months. Includes a mandatory financial counselling session and a 1-week cool-off period after the agreement is offered.",
+  "last_updated": "2026-05-20",
+  "source_url": "https://www.hdb.gov.sg/residential/living-in-an-hdb-flat/for-our-seniors/lease-buyback-scheme"
+}

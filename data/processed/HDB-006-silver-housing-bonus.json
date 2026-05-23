@@ -1,0 +1,66 @@
+{
+  "service_id": "HDB-006",
+  "service_name": "Silver Housing Bonus",
+  "agency": "HDB",
+  "location_type": "Physical_OTH",
+  "rich_description": "The Silver Housing Bonus gives elderly Singapore citizen households a cash bonus of up to $30,000 when they right-size from a larger HDB flat or private property to a 3-room or smaller HDB flat and use part of the sale proceeds to top up their CPF Retirement Account. The top-up funds CPF LIFE monthly payouts for life, and the remaining proceeds (after the CPF top-up) are paid out in cash, providing both a steady retirement income and an immediate lump sum. This is for seniors aged 55 and above whose current home is too big or too expensive to maintain and who want to unlock the value to fund retirement. Unlike Lease Buyback (which lets you stay in the same flat), Silver Housing Bonus requires physically moving to a smaller flat — so it suits seniors who are also looking to downsize for practical reasons like fewer stairs, smaller cleaning load, or being closer to children. Combined with the Enhanced Proximity Housing Grant (up to $30,000 if the new flat is near married children or parents), the total subsidy can be substantial.",
+  "eligibility": {
+    "citizenship": [
+      "citizen"
+    ],
+    "age_min": 55,
+    "age_max": null,
+    "income_ceiling_monthly_sgd": 14000,
+    "employment_status": null,
+    "other_criteria": [
+      "At least one Singapore citizen owner aged 55+",
+      "Selling a larger HDB flat or a private property",
+      "Buying a 3-room or smaller HDB flat as the replacement home",
+      "Household monthly income at or below $14,000 at point of sale",
+      "Must top up CPF Retirement Account with a portion of the sale proceeds (typically up to $60,000 per applicant)"
+    ]
+  },
+  "required_documents": [
+    {
+      "name": "NRIC",
+      "required_if": null,
+      "notes": "For all flat owners"
+    },
+    {
+      "name": "Title deed / ownership documents of current home",
+      "required_if": null,
+      "notes": "HDB flat or private property being sold"
+    },
+    {
+      "name": "CPF statements",
+      "required_if": null,
+      "notes": "To verify CPF Retirement Account balance and top-up calculation"
+    },
+    {
+      "name": "Income documents",
+      "required_if": null,
+      "notes": "To verify household income ≤ $14,000/month"
+    },
+    {
+      "name": "Option to Purchase / sale agreements",
+      "required_if": null,
+      "notes": "For both the flat being sold and the smaller flat being bought"
+    }
+  ],
+  "oth_location": "Level 3, HDB Tampines Branch (Customer Service Counters). HDB officers help compute the CPF top-up amount and the resulting cash payout before the sale completes.",
+  "operating_hours": {
+    "mon-fri": "08:00-17:00",
+    "sat": "08:00-13:00",
+    "sun": "closed"
+  },
+  "contact": {
+    "phone": "1800-225-5432",
+    "email": "hdbtampines@hdb.gov.sg",
+    "website": "https://www.hdb.gov.sg/residential/living-in-an-hdb-flat/for-our-seniors/silver-housing-bonus"
+  },
+  "walk_in_accepted": true,
+  "appointment_required": true,
+  "typical_processing_time": "Bonus is disbursed after the right-sized flat purchase completes and the CPF top-up is made — typically 6-10 weeks after completion of both transactions.",
+  "last_updated": "2026-05-20",
+  "source_url": "https://www.hdb.gov.sg/residential/living-in-an-hdb-flat/for-our-seniors/silver-housing-bonus"
+}
