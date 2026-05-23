@@ -1,0 +1,429 @@
+"""
+OTH Buddy — Smart Concierge backend for Our Tampines Hub.
+
+POST /api/chat
+    Body: { "messages": [...] }
+    Returns: { "reply": "..." }
+
+Data sources:
+- F&B + the info-counter fallback come from `database.json` (the
+  retrieval layer doesn't cover food or facilities).
+- Government services come from the retrieval layer in `src/retrieve.py`
+  (see CHATBOT_INTEGRATION.md for the full contract). The retrieval
+  layer is called once per turn on the latest user message and returns
+  up to top_k structured Service objects, which are then injected into
+  the LLM's system prompt.
+"""
+
+import json
+import os
+from pathlib import Path
+from typing import Literal
+
+from dotenv import load_dotenv
+from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from openai import OpenAI
+from pydantic import BaseModel, Field
+
+try:
+    from src.retrieve import retrieve_services, UserContext, RetrievedService
+except ImportError as e:
+    raise RuntimeError(
+        "Could not import src.retrieve. Copy the digital-oth retrieval "
+        "package (the `src/` folder) into this directory, install its "
+        "requirements, and run `python -m src.ingest` once before starting "
+        "the server. See CHATBOT_INTEGRATION.md > Setup. "
+        f"Original error: {e}"
+    ) from e
+
+load_dotenv()
+
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+# gpt-4o-transcribe is OpenAI's newer transcription model, noticeably better
+# than whisper-1 on accented English. Same per-minute price. Override via env.
+WHISPER_MODEL = os.getenv("WHISPER_MODEL", "gpt-4o-transcribe")
+DATABASE_PATH = Path(__file__).parent / "database.json"
+
+# Whisper / gpt-4o-transcribe treats the `prompt` parameter as if it were the
+# audio that came just *before* the current clip. Showing it natural Singlish
+# sentences anchors the decoder to local phrasing — much more effective than a
+# bare vocabulary list. Keep this under ~244 tokens (model limit).
+WHISPER_SINGLISH_PROMPT = (
+    "The speaker uses Singapore English (Singlish). Example phrases from the "
+    "same speaker:\n"
+    "\"How ah, where do I apply for ComCare?\"\n"
+    "\"My ah ma kena retrenched already lah, very jialat.\"\n"
+    "\"Eh, my BTO cannot pay liao, what to do sia?\"\n"
+    "\"Like that lor, very tough one.\"\n"
+    "\"Can ah? I need help with CPF for my parents.\"\n"
+    "\"Where got financial assistance one?\"\n"
+    "\"Alamak, I lost my job already, no money for makan.\"\n"
+    "\"Uncle, where is the HDB branch ah?\"\n"
+    "Acronyms used: HDB, BTO, CPF, ComCare, NRIC, SingPass, MSF, WSG, "
+    "SkillsFuture, Workfare, MediShield, MediFund, ServiceSG, Tampines, OTH."
+)
+
+# Second-pass LLM correction over the raw Whisper transcript. Whisper tends to
+# map short noisy particles to similar-sounding English words ("ah" → "are",
+# "lah" → "law", "sia" → "see ya"); a small LLM with explicit examples is very
+# good at undoing this. The pass is bounded (refuses corrections that change
+# length wildly, falls through on failure) so a bad LLM call can never make
+# the transcript *worse* than what Whisper produced.
+SINGLISH_CORRECTION_SYSTEM = """\
+You are a Singlish transcription corrector. Input: a rough English transcription \
+of Singapore English (Singlish) speech that may contain mistranscribed particles, \
+local slang, and Singapore government acronyms. Output: the speaker's likely \
+intended Singlish utterance.
+
+Common mistranscription patterns to fix:
+- end-of-clause "are" / "uh" / "ha" / "hah"  →  "ah"
+- end-of-clause "law" / "la" / "lap" / "laa"  →  "lah"
+- end-of-clause "lore" / "law" (after a statement)  →  "lor"
+- end-of-clause "see ya" / "sear" / "see" / "shah"  →  "sia"
+- "alarm ma" / "alarm-uh"  →  "alamak"
+- "jealot" / "jiu lat" / "jail at" / "gerlat"  →  "jialat"
+- "kana"  →  "kena"
+- "ma kan" / "mar can"  →  "makan"
+- "Komkat" / "Kemcare" / "comcare"  →  "ComCare"
+- "BDO" / "B.T.O." → "BTO"
+- "HDP" / "H.D.B." → "HDB"
+- "C.P.F."  →  "CPF"
+- "sing pass"  →  "SingPass"
+- "skills future"  →  "SkillsFuture"
+- "ah ma" / "ar ma" (grandmother)  →  "ah ma"
+- "ah pa" (grandfather)  →  "ah pa"
+
+Rules:
+1. Output ONLY the corrected transcription. No quotes, no preamble, no explanation.
+2. Preserve the speaker's meaning exactly. Don't add or remove content.
+3. Don't change words you're unsure about — only fix obvious mistranscriptions.
+4. Keep punctuation and capitalization natural (sentence case).
+5. If the input is already clean, return it unchanged."""
+
+
+def correct_singlish_transcript(rough: str) -> str:
+    """Run a small LLM cleanup pass over the raw Whisper transcript to fix
+    Singlish particle mistranscriptions. Falls through silently on any
+    failure or implausible output — the rough transcript is the worst case.
+    """
+    rough = rough.strip()
+    if not rough or len(rough) < 3:
+        return rough
+    try:
+        resp = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": SINGLISH_CORRECTION_SYSTEM},
+                {"role": "user", "content": rough},
+            ],
+            temperature=0.1,
+        )
+        corrected = (resp.choices[0].message.content or "").strip()
+        if not corrected:
+            return rough
+        # Sanity check: refuse a correction that changed length by more than 2x.
+        # Protects against the LLM hallucinating a paragraph or returning empty.
+        if not (0.5 * len(rough) <= len(corrected) <= 2.0 * len(rough)):
+            return rough
+        return corrected
+    except Exception:
+        return rough
+
+client = OpenAI()  # reads OPENAI_API_KEY from environment
+
+app = FastAPI(title="OTH Buddy")
+
+# Open CORS so the hackathon frontend can call this from anywhere.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+class ChatMessage(BaseModel):
+    role: Literal["user", "assistant"]
+    content: str
+
+
+class ChatRequest(BaseModel):
+    messages: list[ChatMessage] = Field(..., min_length=1)
+
+
+class ChatResponse(BaseModel):
+    reply: str
+
+
+class TranscriptionResponse(BaseModel):
+    text: str
+
+
+def load_database() -> dict:
+    with open(DATABASE_PATH, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def format_retrieved_services(services: list[RetrievedService]) -> str:
+    """Render the retrieval layer's top-k Service objects as a structured
+    block the LLM can read directly. We never paraphrase or re-parse —
+    structured fields go in verbatim so the LLM has the canonical truth.
+    """
+    if not services:
+        return "(no government services matched this query — do not invent any)"
+
+    blocks = []
+    for r in services:
+        s = r.service
+        hours = "; ".join(f"{k}: {v}" for k, v in s.operating_hours.items()) or "—"
+        docs = ", ".join(d.name for d in s.required_documents) or "—"
+        elig = s.eligibility
+        elig_parts = [f"citizenship: {', '.join(elig.citizenship)}"]
+        if elig.age_min is not None:
+            elig_parts.append(f"age ≥ {elig.age_min}")
+        if elig.age_max is not None:
+            elig_parts.append(f"age ≤ {elig.age_max}")
+        if elig.income_ceiling_monthly_sgd is not None:
+            elig_parts.append(f"household income ≤ S${elig.income_ceiling_monthly_sgd}/mo")
+
+        blocks.append(
+            f"### {s.service_name} ({s.service_id}) — {s.agency}\n"
+            f"- Where at OTH: {s.oth_location}\n"
+            f"- What it is: {s.rich_description}\n"
+            f"- Eligibility: {'; '.join(elig_parts)}\n"
+            f"- Bring: {docs}\n"
+            f"- Hours: {hours}\n"
+            f"- Walk-in: {'yes' if s.walk_in_accepted else 'no'} · "
+            f"Appointment: {'required' if s.appointment_required else 'not required'}\n"
+            f"- Typical processing time: {s.typical_processing_time}\n"
+            f"- Phone: {s.contact.phone or '—'} · Website: {s.contact.website or '—'}"
+        )
+    return "\n\n".join(blocks)
+
+
+def format_general_counters(counters: list) -> str:
+    if not counters:
+        return "(none configured)"
+    blocks = []
+    for c in counters:
+        handles = "\n  - ".join(c.get("handles", []))
+        blocks.append(
+            f"### {c.get('name', 'Counter')} — {c.get('location', '')}\n"
+            f"{c.get('description', '')}\n"
+            f"Handles:\n  - {handles}" if handles else
+            f"### {c.get('name', 'Counter')} — {c.get('location', '')}\n{c.get('description', '')}"
+        )
+    return "\n\n".join(blocks)
+
+
+def build_system_prompt(
+    food: list,
+    counters: list,
+    retrieved: list[RetrievedService],
+    confidence_low: bool,
+    fallback: dict,
+) -> str:
+    food_json = json.dumps(food, ensure_ascii=False, indent=2)
+    counters_block = format_general_counters(counters)
+    services_block = format_retrieved_services(retrieved)
+
+    confidence_note = ""
+    if confidence_low:
+        confidence_note = (
+            "\n> NOTE: Retrieval did NOT find a strong specific-scheme match for "
+            "this query. If the question is about a broad government topic "
+            "(CPF, IRAS, SingPass, MOM, generic HDB queries), point the user "
+            "to the ServiceSG counter above. For scheme-specific details that "
+            "aren't covered, you MAY use web_search (see policy below).\n"
+        )
+
+    fallback_name = fallback.get("name", "OTH Information Counter")
+    fallback_loc = fallback.get("location", "Level 1, Main Atrium")
+
+    return f"""You are **OTH Buddy**, the Smart Concierge for Our Tampines Hub (OTH) in Singapore.
+
+# Your persona
+- Warm, empathetic, patient, and encouraging — like a kind neighbour who knows the building inside out.
+- Singaporean tone: friendly and clear, plain English. You may use light local terms ("kopi", "uncle/auntie") only when the user's message has the same vibe — never forced.
+- Many visitors are stressed (job loss, money worries, housing). Acknowledge their feelings before jumping into directions.
+
+# Decision tree (read this FIRST, every turn)
+
+Classify the user's message into one of these buckets and act accordingly:
+
+1. **Food / drinks / makan** → use the F&B block (block 1). Recommend 2-3 specific places.
+2. **Specific scheme already in the retrieval block** (block 3) → use that block's data. Build a step-by-step route.
+3. **Broad government enquiry** (CPF, IRAS, SingPass, MOM, generic HDB question, general tax) → answer using the ServiceSG counter (block 2). NEVER say "I'm not sure" for these — ServiceSG is exactly the counter for them.
+4. **Scheme-specific details NOT in block 3** (e.g. "how much CPF can I withdraw at 55", "what's the latest BTO income ceiling", "MediShield Life premiums", "Workfare 2026 amounts") → call **web_search** to fetch current numbers/rules from .gov.sg, then route the user to the right counter (ServiceSG for CPF/IRAS/SingPass/MOM, HDB Tampines Branch for HDB, MSF SSO for financial help, WSG Careers Connect for jobs/SkillsFuture).
+5. **Non-government facility/amenity question** (food court closing time, lost-and-found, swimming pool, library, parking) → route to the {fallback_name} at {fallback_loc}.
+6. **Greeting / small talk / follow-up about a service already mentioned** → respond directly, no search, no routing.
+
+The "I'm not sure" Information Counter handoff is ONLY for bucket 5. NEVER use it for any government / financial / scheme question.
+
+# Your sources of truth (consult in this order, then web search only if needed)
+
+## 1. Food & Beverage at OTH
+```json
+{food_json}
+```
+
+## 2. General service counters at OTH (use for broad government enquiries)
+{counters_block}
+
+## 3. Specific schemes available at OTH counters (retrieval-filtered for THIS query)
+{services_block}
+{confidence_note}
+## 4. Information Counter (NON-government facility questions only — bucket 5 above)
+For genuine facility / amenity questions only, route to **{fallback_name}** at **{fallback_loc}**. Compose your own warm one-line message; do not use a stock phrase. Government / financial / scheme questions NEVER go here.
+
+# Web search policy (the `web_search` tool)
+
+You have access to a web_search tool. It is the LAST resort — sources 1-4 above are the source of truth.
+
+USE web_search ONLY when:
+- The user asks for scheme-specific details (eligibility numbers, dollar amounts, dates, application URLs, latest rules) that are NOT in any block above. Examples: "how much CPF can I withdraw at 55", "what's the latest BTO income ceiling", "is there a new MediShield premium subsidy".
+- The user asks about a related Singapore government scheme not in the blocks above (e.g. MediFund tiers, CDC vouchers, Workfare amounts).
+
+DO NOT use web_search for:
+- Anything already covered in blocks 1-4 — read them first.
+- F&B / facility / small-talk / greetings.
+- "Where do I go for X" — point to the relevant counter from the blocks above. The blocks already tell you where things are at OTH.
+- General Singapore questions unrelated to government services at OTH.
+
+When you DO search:
+- Prefer **.gov.sg** sources (cpf.gov.sg, hdb.gov.sg, msf.gov.sg, ssg-wsg.gov.sg, iras.gov.sg, moh.gov.sg, mom.gov.sg). Quote specific numbers and dates verbatim — don't paraphrase loosely.
+- **Always tie the answer back to OTH** at the end with a concrete in-person step:
+  - CPF / IRAS / SingPass / MOM / general gov enquiries → ServiceSG counter, Level 1, #01-21.
+  - HDB scheme-specific → HDB Tampines Branch.
+  - Financial assistance / social services → MSF SSO Tampines.
+  - Career / SkillsFuture → WSG Careers Connect.
+  - Don't know → Information Counter, Level 1, Main Atrium.
+- If the search returns nothing useful, say so plainly and route the user to the right counter.
+
+# How to answer
+
+## Food queries
+Recommend 2-3 specific F&B places. For each: exact name + exact location + one-line reason tailored to the user (budget, halal, group, quick bite, quiet, etc.).
+
+## Government-service / financial-distress queries (specific schemes covered by block 3)
+- Acknowledge their situation in 1-2 warm sentences. Be real, not saccharine.
+- Map a logical step-by-step physical route through OTH, ordered by urgency.
+- For each step: service name, exact oth_location, what to do, what to bring (from the `Bring:` line), walk-in vs appointment.
+- End with a practical tip on bringing NRIC + recent payslips/bank statements + any letters received, only when relevant.
+
+## Broad government enquiries (CPF, IRAS, SingPass, MOM, generic HDB)
+Point them to the **ServiceSG counter at Level 1, #01-21** with a one-line note on what to bring (NRIC always; for CPF, their last CPF statement; for IRAS, last tax filing letter). If they want specific scheme details (e.g. CPF withdrawal amount at 55), use web_search to get the number, then still route them to ServiceSG for in-person help.
+
+## Mixed queries ("settle my HDB matter, then grab lunch")
+Handle the government step first, then suggest 1-2 F&B options nearby on the same level if possible.
+
+# Hard rules — do not break
+1. **For places listed in blocks 1-4, never invent details.** Names, locations, hours, documents, eligibility — use only what's in the blocks. If the blocks don't have the detail, either web_search-and-quote, or say you don't have that info and suggest the right counter.
+2. **For schemes not in the blocks**, use web_search and quote .gov.sg sources. Don't make up numbers, dates, or rules.
+3. **Never give medical, legal, or financial advice** beyond pointing to the right counter.
+4. **Never promise outcomes** ("you will definitely get the loan"). Use "they can assess your case".
+5. If the user is in immediate distress (mentions self-harm, abuse, no food tonight, nowhere to sleep), gently share the **24-hour ComCare hotline 1800-222-0000** alongside the route you suggest.
+6. Keep replies concise and actionable. Always include exact level + unit number when naming a place.
+
+Now respond to the user's message."""
+
+
+@app.get("/")
+def home():
+    # Disable browser caching of index.html so every reload picks up the
+    # latest UI without users needing to hard-refresh. The page itself is
+    # tiny; the cost of fetching it fresh each time is negligible.
+    response = FileResponse(Path(__file__).parent / "index.html")
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
+
+
+@app.get("/health")
+def health():
+    return {"status": "ok", "service": "OTH Buddy"}
+
+
+@app.post("/api/chat", response_model=ChatResponse)
+def chat(req: ChatRequest):
+    last = req.messages[-1]
+    if last.role != "user" or not last.content.strip():
+        raise HTTPException(status_code=400, detail="last message must be a non-empty user message")
+
+    try:
+        db = load_database()
+    except FileNotFoundError:
+        raise HTTPException(status_code=500, detail="database.json not found")
+    except json.JSONDecodeError as e:
+        raise HTTPException(status_code=500, detail=f"database.json is invalid: {e}")
+
+    retrieval = retrieve_services(last.content, user_context=None, top_k=3)
+
+    system_prompt = build_system_prompt(
+        food=db.get("Food_and_Beverage", []),
+        counters=db.get("General_Service_Counters", []),
+        retrieved=retrieval.services,
+        confidence_low=retrieval.confidence_low,
+        fallback=db.get(
+            "Fallback",
+            {"name": "OTH Information Counter", "location": "Level 1, Main Atrium"},
+        ),
+    )
+
+    # Use the OpenAI Responses API rather than Chat Completions so we get the
+    # built-in `web_search_preview` tool. The model decides per-question
+    # whether to search — the system prompt above tells it to prefer the
+    # local blocks and only search for scheme-specific details that aren't
+    # covered. From our side it's still a single round-trip; the model
+    # handles search invocation internally and returns the final reply.
+    input_items = [{"role": m.role, "content": m.content} for m in req.messages]
+
+    try:
+        response = client.responses.create(
+            model=OPENAI_MODEL,
+            instructions=system_prompt,
+            input=input_items,
+            tools=[{"type": "web_search_preview"}],
+            temperature=0.6,
+        )
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"OpenAI request failed: {e}")
+
+    reply = (getattr(response, "output_text", "") or "").strip()
+    return ChatResponse(reply=reply)
+
+
+@app.post("/api/transcribe", response_model=TranscriptionResponse)
+async def transcribe(audio: UploadFile = File(...)):
+    """Speech-to-text for the mic button. The frontend records a short
+    audio blob via MediaRecorder and POSTs it here; we forward to Whisper
+    with an English language hint and a Singlish vocabulary prompt, then
+    return the text. The frontend fills its textarea with the result so
+    the user can review/edit before pressing Send — STT mistakes are
+    common with elderly speakers and auto-sending a wrong transcript is
+    a worse UX than letting them correct it.
+    """
+    audio_bytes = await audio.read()
+    if not audio_bytes:
+        raise HTTPException(status_code=400, detail="empty audio file")
+
+    filename = audio.filename or "speech.webm"
+    mime = audio.content_type or "audio/webm"
+
+    try:
+        result = client.audio.transcriptions.create(
+            model=WHISPER_MODEL,
+            file=(filename, audio_bytes, mime),
+            language="en",
+            prompt=WHISPER_SINGLISH_PROMPT,
+            temperature=0,
+        )
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"Whisper request failed: {e}")
+
+    rough = (result.text or "").strip()
+    corrected = correct_singlish_transcript(rough)
+    return TranscriptionResponse(text=corrected)

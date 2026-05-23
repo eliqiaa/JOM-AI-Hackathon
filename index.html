@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>OTH Buddy</title>
+<!-- Silero VAD (speech-vs-noise classifier) — lazy-loaded on first mic use.
+     Used to auto-stop the mic only when the USER stops speaking, ignoring
+     background noise. Falls through to a level-based VAD if the model
+     can't be fetched (e.g. no internet). -->
+<script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.14.0/dist/ort.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@ricky0123/vad-web@0.0.22/dist/bundle.min.js"></script>
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-assistant: #f7f7f8;
+    --text: #1f2328;
+    --muted: #6e7681;
+    --border: #e5e7eb;
+    --accent: #10a37f;
+    --accent-hover: #0d8a6a;
+    --user-avatar: #5a67d8;
+    --assistant-avatar: #10a37f;
+    --sidebar-bg: #f9f9f9;
+    --hover: #ececec;
+    --code-bg: #f4f4f5;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .layout { display: flex; height: 100vh; }
+
+  /* Sidebar */
+  .sidebar {
+    width: 260px;
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .sidebar h2 {
+    font-size: 13px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 16px 4px 4px;
+  }
+  .new-chat {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.1s;
+  }
+  .new-chat:hover { background: var(--hover); }
+  .sidebar-footer {
+    margin-top: auto;
+    font-size: 12px;
+    color: var(--muted);
+    padding: 8px 4px;
+    border-top: 1px solid var(--border);
+  }
+  .sidebar-footer .model {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    color: var(--text);
+  }
+
+  /* Main chat area */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .topbar {
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--bg);
+  }
+  .topbar .title {
+    font-weight: 600;
+    font-size: 15px;
+  }
+  .topbar .subtitle {
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    font-size: 18px;
+  }
+
+  /* Messages */
+  #messages {
+    flex: 1;
+    overflow-y: auto;
+  }
+  .row {
+    width: 100%;
+    border-bottom: 1px solid var(--border);
+  }
+  .row.assistant { background: var(--bg-assistant); }
+  .row.user { background: var(--bg); }
+  .row-inner {
+    max-width: 768px;
+    margin: 0 auto;
+    padding: 20px 20px;
+    display: flex;
+    gap: 16px;
+  }
+  .avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 13px;
+  }
+  .row.user .avatar { background: var(--user-avatar); }
+  .row.assistant .avatar { background: var(--assistant-avatar); }
+  .content {
+    flex: 1;
+    min-width: 0;
+    word-wrap: break-word;
+    overflow-wrap: anywhere;
+  }
+  .content > *:first-child { margin-top: 0; }
+  .content > *:last-child { margin-bottom: 0; }
+  .content p { margin: 0 0 12px; }
+  .content strong { font-weight: 600; }
+  .content em { font-style: italic; }
+  .content ul, .content ol { margin: 0 0 12px; padding-left: 24px; }
+  .content li { margin: 4px 0; }
+  .content h1, .content h2, .content h3 {
+    font-weight: 600;
+    margin: 16px 0 8px;
+    line-height: 1.3;
+  }
+  .content h1 { font-size: 1.4em; }
+  .content h2 { font-size: 1.25em; }
+  .content h3 { font-size: 1.1em; }
+  .content code {
+    background: var(--code-bg);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.9em;
+  }
+  .content pre {
+    background: var(--code-bg);
+    padding: 12px;
+    border-radius: 6px;
+    overflow-x: auto;
+    margin: 0 0 12px;
+  }
+  .content pre code { background: none; padding: 0; }
+  .content a { color: var(--accent); text-decoration: underline; }
+  .content blockquote {
+    border-left: 3px solid var(--border);
+    padding-left: 12px;
+    color: var(--muted);
+    margin: 0 0 12px;
+  }
+
+  /* Typing indicator */
+  .typing {
+    display: inline-flex;
+    gap: 5px;
+    padding: 4px 0;
+  }
+  .typing span {
+    width: 7px; height: 7px;
+    background: #9ca3af;
+    border-radius: 50%;
+    animation: bounce 1.2s infinite ease-in-out;
+  }
+  .typing span:nth-child(2) { animation-delay: 0.15s; }
+  .typing span:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes bounce {
+    0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
+    40% { transform: scale(1); opacity: 1; }
+  }
+
+  /* Error banner */
+  .error {
+    max-width: 768px;
+    margin: 12px auto;
+    padding: 10px 14px;
+    background: #fee2e2;
+    color: #991b1b;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+
+  /* Composer */
+  .composer-wrap {
+    padding: 16px 20px 20px;
+    background: linear-gradient(to bottom, rgba(255,255,255,0), var(--bg) 30%);
+  }
+  .composer {
+    max-width: 768px;
+    margin: 0 auto;
+    position: relative;
+  }
+  .composer textarea {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 50px 14px 16px;
+    font-family: inherit;
+    font-size: 16px;
+    line-height: 1.5;
+    resize: none;
+    outline: none;
+    max-height: 200px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    background: var(--bg);
+    color: var(--text);
+  }
+  .composer textarea:focus { border-color: #9ca3af; }
+  .composer .send-btn {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: none;
+    background: var(--accent);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.1s;
+  }
+  .composer .send-btn:hover:not(:disabled) { background: var(--accent-hover); }
+  .composer .send-btn:disabled {
+    background: #d1d5db;
+    cursor: not-allowed;
+  }
+  .composer .send-btn svg { width: 16px; height: 16px; }
+
+  /* Voice bar — prominent mic above the composer, designed for elderly users */
+  .voice-bar {
+    max-width: 768px;
+    margin: 0 auto 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 0 8px;
+  }
+  .voice-bar .mic-btn {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    background: var(--bg);
+    color: var(--accent);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.1s, color 0.1s, transform 0.08s, border-color 0.1s;
+    flex-shrink: 0;
+    box-shadow: 0 2px 10px rgba(16, 163, 127, 0.18);
+  }
+  .voice-bar .mic-btn:hover:not(:disabled) {
+    background: var(--accent);
+    color: white;
+  }
+  .voice-bar .mic-btn:active { transform: scale(0.95); }
+  .voice-bar .mic-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .voice-bar .mic-btn svg { width: 28px; height: 28px; }
+  .voice-bar .mic-btn.recording {
+    background: #ef4444;
+    color: white;
+    border-color: #ef4444;
+    animation: pulse 1.2s infinite ease-in-out;
+    box-shadow: 0 2px 10px rgba(239, 68, 68, 0.4);
+  }
+  .voice-bar .mic-btn.transcribing {
+    background: #fbbf24;
+    color: white;
+    border-color: #fbbf24;
+    box-shadow: 0 2px 10px rgba(251, 191, 36, 0.4);
+  }
+  .voice-status {
+    font-size: 15px;
+    color: var(--text);
+    font-weight: 500;
+    min-width: 0;
+  }
+  .voice-status .voice-sub {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 400;
+    margin-top: 2px;
+  }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); }
+    50% { box-shadow: 0 0 0 18px rgba(239, 68, 68, 0); }
+  }
+
+  /* Topbar speaker toggle (TTS) */
+  .topbar { justify-content: space-between; }
+  .topbar .topbar-left { display: flex; align-items: center; gap: 10px; }
+  .topbar .speaker-btn {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text);
+    transition: background 0.1s;
+  }
+  .topbar .speaker-btn:hover { background: var(--hover); }
+  .topbar .speaker-btn.off { opacity: 0.6; }
+  .topbar .speaker-btn svg { width: 16px; height: 16px; }
+  .hint {
+    max-width: 768px;
+    margin: 8px auto 0;
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  /* Empty state */
+  .empty {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+  }
+  .empty h1 {
+    font-size: 28px;
+    font-weight: 600;
+    margin: 0 0 8px;
+  }
+  .empty p {
+    color: var(--muted);
+    margin: 0 0 24px;
+    max-width: 500px;
+  }
+  .suggestions {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    max-width: 600px;
+    width: 100%;
+  }
+  .suggestion {
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg);
+    cursor: pointer;
+    text-align: left;
+    font-size: 14px;
+    color: var(--text);
+    transition: background 0.1s;
+  }
+  .suggestion:hover { background: var(--hover); }
+  .suggestion .title { font-weight: 600; margin-bottom: 2px; }
+  .suggestion .sub { color: var(--muted); font-size: 12px; }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    .sidebar {
+      position: fixed;
+      left: 0; top: 0; bottom: 0;
+      transform: translateX(-100%);
+      transition: transform 0.2s;
+      z-index: 10;
+      box-shadow: 2px 0 20px rgba(0,0,0,0.1);
+    }
+    .sidebar.open { transform: translateX(0); }
+    .menu-toggle { display: block; }
+    .suggestions { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <button class="new-chat" onclick="newChat()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+      New chat
+    </button>
+    <h2>About</h2>
+    <div style="font-size: 13px; color: var(--muted); padding: 0 4px;">
+      OTH Buddy is a smart concierge for Our Tampines Hub. It can recommend food places and guide you to the right public services inside the building.
+    </div>
+    <div class="sidebar-footer">
+      Backend: FastAPI<br>
+      Model: <span class="model" id="modelName">gpt-4o-mini</span>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+        <div>
+          <div class="title">OTH Buddy</div>
+          <div class="subtitle">Smart Concierge for Our Tampines Hub</div>
+        </div>
+      </div>
+      <button class="speaker-btn" id="speakerBtn" type="button" title="Read replies aloud">
+        <svg id="speakerIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+        <span id="speakerLabel">Speak</span>
+      </button>
+    </div>
+
+    <div id="messages"></div>
+
+    <div class="composer-wrap">
+      <div class="voice-bar">
+        <button id="mic" class="mic-btn" type="button" title="Tap to speak" aria-label="Tap to speak">
+          <svg id="micIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+        </button>
+        <div class="voice-status" id="voiceStatus">
+          Tap the mic to speak
+          <span class="voice-sub">Auto-stops after a short pause</span>
+        </div>
+      </div>
+      <form class="composer" id="form">
+        <textarea id="input" rows="1" placeholder="Or type your message here..." autofocus></textarea>
+        <button id="send" class="send-btn" type="submit" title="Send">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+        </button>
+      </form>
+      <div class="hint">Enter to send · Shift+Enter for new line</div>
+    </div>
+  </main>
+</div>
+
+<script>
+  const API_URL = "/api/chat";
+  const TRANSCRIBE_URL = "/api/transcribe";
+  const messagesEl = document.getElementById("messages");
+  const form = document.getElementById("form");
+  const input = document.getElementById("input");
+  const sendBtn = document.getElementById("send");
+  const micBtn = document.getElementById("mic");
+  const voiceStatus = document.getElementById("voiceStatus");
+  const speakerBtn = document.getElementById("speakerBtn");
+  const speakerLabel = document.getElementById("speakerLabel");
+
+  // Conversation history sent to the backend on each request.
+  let history = [];
+
+  // ----- Speech I/O state -----
+  let mediaRecorder = null;
+  let recordingChunks = [];
+  let isRecording = false;
+  // Track whether the message currently being composed came from voice.
+  // Used to gate TTS — we only speak the reply if the user spoke first.
+  let usedVoiceForThisMessage = false;
+
+  // Voice Activity Detection. Two layers:
+  //  1. Silero VAD (a small neural net that classifies each ~30ms frame as
+  //     speech vs non-speech). Auto-stops the mic when the USER stops
+  //     speaking, ignoring background noise — AC hum, footsteps, music
+  //     etc. don't trigger it because they're not speech.
+  //  2. Level-based VAD (fallback). Used when Silero fails to load
+  //     (e.g. offline) — keeps the mic functional, just less smart.
+  let audioCtx = null;
+  let vadAnalyser = null;
+  let vadRafId = null;
+  let speechVad = null;          // Silero instance (when available)
+  let speechVadEndTimer = null;  // grace period after end-of-speech
+  const VAD_CALIBRATION_MS = 600;    // sample ambient noise over a longer window
+  const VAD_VOICE_MARGIN_DB = 9;     // voice = noise floor + this many dB (lower = more sensitive)
+  const VAD_SILENCE_MS = 3500;       // stop after this much silence (post-voice). Elderly speakers pause mid-sentence; 3.5s tolerates a thinking beat.
+  const VAD_MIN_RECORD_MS = 1500;    // don't auto-stop in the first 1.5s
+  const VAD_HARD_TIMEOUT_MS = 30000; // hard cap, in case VAD never settles
+
+  function setVoiceStatus(main, sub) {
+    voiceStatus.innerHTML = `${main}<span class="voice-sub">${sub}</span>`;
+  }
+
+  // TTS preference persists across reloads. Default ON for elderly users.
+  const SPEAK_PREF_KEY = "oth-buddy-speak";
+  let speakOn = localStorage.getItem(SPEAK_PREF_KEY) !== "off";
+
+  function renderMarkdown(text) {
+    const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+    // Extract fenced code blocks first to protect them from other replacements.
+    const codeBlocks = [];
+    text = text.replace(/```([\s\S]*?)```/g, (_, code) => {
+      codeBlocks.push(code);
+      return ` CODE${codeBlocks.length - 1} `;
+    });
+
+    let html = esc(text);
+
+    // Inline code
+    html = html.replace(/`([^`\n]+)`/g, "<code>$1</code>");
+    // Bold + italic
+    html = html.replace(/\*\*\*(.+?)\*\*\*/g, "<strong><em>$1</em></strong>");
+    html = html.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+    html = html.replace(/(^|[^\*])\*([^\*\n]+)\*/g, "$1<em>$2</em>");
+    // Headers
+    html = html.replace(/^### (.+)$/gm, "<h3>$1</h3>");
+    html = html.replace(/^## (.+)$/gm, "<h2>$1</h2>");
+    html = html.replace(/^# (.+)$/gm, "<h1>$1</h1>");
+
+    // Build paragraphs and lists line-by-line
+    const lines = html.split("\n");
+    const out = [];
+    let listType = null; // 'ul', 'ol', or null
+    let paraBuffer = [];
+
+    const flushPara = () => {
+      if (paraBuffer.length) {
+        out.push("<p>" + paraBuffer.join("<br>") + "</p>");
+        paraBuffer = [];
+      }
+    };
+    const closeList = () => {
+      if (listType) { out.push(`</${listType}>`); listType = null; }
+    };
+
+    for (const line of lines) {
+      const ulMatch = line.match(/^\s*[-*]\s+(.*)$/);
+      const olMatch = line.match(/^\s*\d+\.\s+(.*)$/);
+      const isHeader = /^<h[1-3]>/.test(line);
+
+      if (ulMatch) {
+        flushPara();
+        if (listType !== "ul") { closeList(); out.push("<ul>"); listType = "ul"; }
+        out.push("<li>" + ulMatch[1] + "</li>");
+      } else if (olMatch) {
+        flushPara();
+        if (listType !== "ol") { closeList(); out.push("<ol>"); listType = "ol"; }
+        out.push("<li>" + olMatch[1] + "</li>");
+      } else if (isHeader) {
+        flushPara();
+        closeList();
+        out.push(line);
+      } else if (line.trim() === "") {
+        flushPara();
+        closeList();
+      } else {
+        closeList();
+        paraBuffer.push(line);
+      }
+    }
+    flushPara();
+    closeList();
+
+    let result = out.join("\n");
+
+    // Restore code blocks
+    result = result.replace(/ CODE(\d+) /g, (_, i) => {
+      return "<pre><code>" + esc(codeBlocks[Number(i)]) + "</code></pre>";
+    });
+
+    return result;
+  }
+
+  function clearEmpty() {
+    const empty = document.getElementById("empty");
+    if (empty) empty.remove();
+  }
+
+  function addMessage(text, role) {
+    clearEmpty();
+    const row = document.createElement("div");
+    row.className = "row " + role;
+    const inner = document.createElement("div");
+    inner.className = "row-inner";
+    const avatar = document.createElement("div");
+    avatar.className = "avatar";
+    avatar.textContent = role === "user" ? "U" : "AI";
+    const content = document.createElement("div");
+    content.className = "content";
+    if (role === "assistant") {
+      content.innerHTML = renderMarkdown(text);
+    } else {
+      content.textContent = text;
+    }
+    inner.appendChild(avatar);
+    inner.appendChild(content);
+    row.appendChild(inner);
+    messagesEl.appendChild(row);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+    return content;
+  }
+
+  function addTyping() {
+    clearEmpty();
+    const row = document.createElement("div");
+    row.className = "row assistant";
+    row.id = "typing-row";
+    const inner = document.createElement("div");
+    inner.className = "row-inner";
+    const avatar = document.createElement("div");
+    avatar.className = "avatar";
+    avatar.textContent = "AI";
+    const content = document.createElement("div");
+    content.className = "content";
+    content.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
+    inner.appendChild(avatar);
+    inner.appendChild(content);
+    row.appendChild(inner);
+    messagesEl.appendChild(row);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+    return row;
+  }
+
+  function addError(text) {
+    const div = document.createElement("div");
+    div.className = "error";
+    div.textContent = text;
+    messagesEl.appendChild(div);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function renderEmpty() {
+    messagesEl.innerHTML = `
+      <div class="empty" id="empty">
+        <h1>OTH Buddy</h1>
+        <p>Ask me about food, public services, or what to do if you need help inside Our Tampines Hub.</p>
+        <div class="suggestions">
+          <button class="suggestion" data-q="I'm hungry, where can I get cheap halal food?">
+            <div class="title">🍜 Find food</div>
+            <div class="sub">Cheap halal lunch options at OTH</div>
+          </button>
+          <button class="suggestion" data-q="I just got retrenched and I'm worried I can't pay my BTO mortgage. What should I do?">
+            <div class="title">💼 Get help</div>
+            <div class="sub">Lost my job, can't pay mortgage</div>
+          </button>
+          <button class="suggestion" data-q="My elderly mum needs help with her CPF and we're worried about money for daily expenses.">
+            <div class="title">👵 Senior support</div>
+            <div class="sub">CPF + financial help for elderly</div>
+          </button>
+          <button class="suggestion" data-q="I need to apply for ComCare assistance. Where do I go?">
+            <div class="title">📋 ComCare</div>
+            <div class="sub">Where to apply for financial aid</div>
+          </button>
+        </div>
+      </div>`;
+    document.querySelectorAll(".suggestion").forEach(btn => {
+      btn.addEventListener("click", () => send(btn.dataset.q));
+    });
+  }
+
+  function newChat() {
+    history = [];
+    messagesEl.innerHTML = "";
+    renderEmpty();
+    input.focus();
+    if (window.innerWidth <= 768) {
+      document.getElementById("sidebar").classList.remove("open");
+    }
+  }
+
+  function toggleSidebar() {
+    document.getElementById("sidebar").classList.toggle("open");
+  }
+
+  async function send(message) {
+    // Snapshot whether voice was used for THIS message before resetting.
+    // TTS only fires when the user spoke their question — typed messages
+    // get a text-only reply.
+    const shouldSpeakReply = usedVoiceForThisMessage;
+    usedVoiceForThisMessage = false;
+
+    addMessage(message, "user");
+    history.push({ role: "user", content: message });
+    const typingRow = addTyping();
+    sendBtn.disabled = true;
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: history })
+      });
+      typingRow.remove();
+      if (!res.ok) {
+        const errText = await res.text();
+        addError(`Server returned ${res.status}: ${errText}`);
+        history.pop();
+        return;
+      }
+      const data = await res.json();
+      const reply = data.reply || "(empty reply)";
+      addMessage(reply, "assistant");
+      history.push({ role: "assistant", content: reply });
+      if (shouldSpeakReply) speakReply(reply);
+    } catch (e) {
+      typingRow.remove();
+      addError("Could not reach the server. Is uvicorn still running on port 8000?");
+      history.pop();
+    } finally {
+      sendBtn.disabled = false;
+      input.focus();
+    }
+  }
+
+  // ----- Speech-to-Text (mic button) -----
+  async function startRecording() {
+    if (!navigator.mediaDevices || !window.MediaRecorder) {
+      addError("Your browser does not support voice input. Please type instead.");
+      return;
+    }
+    try {
+      // WebRTC audio constraints — tells the browser to apply built-in noise
+      // suppression + echo cancellation + auto gain to the mic stream, which
+      // helps a lot in noisy environments like a community hub atrium.
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          noiseSuppression: true,
+          echoCancellation: true,
+          autoGainControl: true,
+          channelCount: 1,
+        }
+      });
+
+      mediaRecorder = new MediaRecorder(stream);
+      recordingChunks = [];
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data && e.data.size > 0) recordingChunks.push(e.data);
+      };
+      mediaRecorder.onstop = async () => {
+        stream.getTracks().forEach(t => t.stop());
+        teardownVad();
+        const mime = mediaRecorder.mimeType || "audio/webm";
+        const blob = new Blob(recordingChunks, { type: mime });
+        await transcribeAndFill(blob, mime);
+      };
+      mediaRecorder.start();
+      isRecording = true;
+      micBtn.classList.add("recording");
+      micBtn.title = "Tap to stop";
+      setVoiceStatus("Listening...", "Speak naturally. I'll stop when you finish.");
+
+      // Prefer Silero (speech-vs-noise neural net). Fall back to level VAD
+      // if the model isn't available — that keeps the mic working in any
+      // environment, just less smart about distinguishing speech from noise.
+      const speechVadStarted = await tryStartSpeechVad(stream);
+      if (!speechVadStarted) startVad(stream);
+    } catch (err) {
+      addError("Microphone permission denied or unavailable. Check your browser settings.");
+    }
+  }
+
+  // ----- Silero speech VAD (preferred) -----
+  async function tryStartSpeechVad(stream) {
+    if (!window.vad || !window.vad.AudioNodeVAD) return false;
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const source = audioCtx.createMediaStreamSource(stream);
+      speechVad = await window.vad.AudioNodeVAD.new(audioCtx, {
+        // Stricter than default so distant chatter / TV in the background
+        // doesn't accidentally trigger as "speech".
+        positiveSpeechThreshold: 0.6,
+        negativeSpeechThreshold: 0.35,
+        // ~30ms per frame. 24 frames ≈ 750ms — lets the user have a short
+        // mid-sentence pause without the VAD declaring speech ended.
+        redemptionFrames: 24,
+        minSpeechFrames: 3,
+        onSpeechStart: () => {
+          // If we'd queued a stop because they paused, cancel it — they
+          // resumed speaking before the grace window expired.
+          if (speechVadEndTimer) {
+            clearTimeout(speechVadEndTimer);
+            speechVadEndTimer = null;
+          }
+          setVoiceStatus("Listening...", "I'll stop after you finish.");
+        },
+        onSpeechEnd: () => {
+          // Don't stop instantly — wait 1.5s in case they're just taking a
+          // breath. If they speak again within that window, onSpeechStart
+          // fires and cancels this timer above.
+          if (speechVadEndTimer) clearTimeout(speechVadEndTimer);
+          speechVadEndTimer = setTimeout(() => {
+            if (isRecording) stopRecording();
+          }, 1500);
+        },
+        baseAssetPath: "https://cdn.jsdelivr.net/npm/@ricky0123/vad-web@0.0.22/dist/",
+        onnxWASMBasePath: "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.14.0/dist/",
+      });
+      speechVad.receive(source);
+      speechVad.start();
+      return true;
+    } catch (e) {
+      console.warn("Silero VAD setup failed, falling back to level VAD:", e);
+      if (audioCtx) { audioCtx.close().catch(() => {}); audioCtx = null; }
+      speechVad = null;
+      return false;
+    }
+  }
+
+  function teardownSpeechVad() {
+    if (speechVadEndTimer) { clearTimeout(speechVadEndTimer); speechVadEndTimer = null; }
+    if (speechVad) {
+      try { speechVad.pause(); } catch (e) {}
+      try { speechVad.destroy(); } catch (e) {}
+      speechVad = null;
+    }
+  }
+
+  function stopRecording() {
+    if (mediaRecorder && mediaRecorder.state === "recording") {
+      mediaRecorder.stop();
+    }
+    isRecording = false;
+    micBtn.classList.remove("recording");
+    micBtn.title = "Tap to speak";
+  }
+
+  // ----- Voice Activity Detection (adaptive to background noise) -----
+  function startVad(stream) {
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const source = audioCtx.createMediaStreamSource(stream);
+      vadAnalyser = audioCtx.createAnalyser();
+      vadAnalyser.fftSize = 1024;
+      vadAnalyser.smoothingTimeConstant = 0.4;
+      source.connect(vadAnalyser);
+
+      const buf = new Uint8Array(vadAnalyser.fftSize);
+      const startedAt = Date.now();
+      const noiseSamples = [];
+      let noiseFloorDb = -50;   // updated after the calibration window
+      let calibrated = false;
+      let lastVoiceAt = Date.now();
+      let everHeardVoice = false;
+
+      const readDb = () => {
+        vadAnalyser.getByteTimeDomainData(buf);
+        let sum = 0;
+        for (let i = 0; i < buf.length; i++) {
+          const x = (buf[i] - 128) / 128;
+          sum += x * x;
+        }
+        const rms = Math.sqrt(sum / buf.length);
+        return 20 * Math.log10(Math.max(rms, 1e-6));
+      };
+
+      const tick = () => {
+        if (!isRecording) return;
+        const db = readDb();
+        const now = Date.now();
+        const elapsed = now - startedAt;
+
+        // Phase 1: measure ambient noise. We use the 20th-percentile sample
+        // (not the median) because elderly users often start speaking before
+        // the calibration window finishes — the median would then be biased
+        // upward by their voice. The 20th percentile catches the quiet
+        // moments between syllables, which is closer to the true noise floor.
+        if (!calibrated) {
+          noiseSamples.push(db);
+          if (elapsed >= VAD_CALIBRATION_MS) {
+            const sorted = [...noiseSamples].sort((a, b) => a - b);
+            noiseFloorDb = sorted[Math.floor(sorted.length * 0.2)];
+            calibrated = true;
+          }
+          vadRafId = requestAnimationFrame(tick);
+          return;
+        }
+
+        // Slowly track downward drift in the noise floor (e.g. the air-con
+        // turning off). Never adapt upward — that would let a long speech
+        // raise the floor and silence wouldn't register.
+        if (db < noiseFloorDb) {
+          noiseFloorDb = noiseFloorDb * 0.9 + db * 0.1;
+        }
+
+        const voiceThreshold = noiseFloorDb + VAD_VOICE_MARGIN_DB;
+        if (db > voiceThreshold) {
+          lastVoiceAt = now;
+          if (!everHeardVoice) {
+            everHeardVoice = true;
+            setVoiceStatus("Listening...", "I'll stop when you pause.");
+          }
+        }
+
+        const silenceFor = now - lastVoiceAt;
+        const shouldStop =
+          (everHeardVoice && elapsed > VAD_MIN_RECORD_MS && silenceFor > VAD_SILENCE_MS) ||
+          (elapsed > VAD_HARD_TIMEOUT_MS);
+        if (shouldStop) {
+          stopRecording();
+          return;
+        }
+        vadRafId = requestAnimationFrame(tick);
+      };
+      vadRafId = requestAnimationFrame(tick);
+    } catch (e) {
+      // VAD is a nice-to-have. If it fails, the mic still works manually.
+      console.warn("VAD setup failed:", e);
+    }
+  }
+
+  function teardownVad() {
+    teardownSpeechVad();
+    if (vadRafId) { cancelAnimationFrame(vadRafId); vadRafId = null; }
+    if (audioCtx) { audioCtx.close().catch(() => {}); audioCtx = null; }
+    vadAnalyser = null;
+  }
+
+  async function transcribeAndFill(blob, mime) {
+    const ext = mime.includes("mp4") ? "m4a"
+              : mime.includes("ogg") ? "ogg"
+              : mime.includes("wav") ? "wav"
+              : "webm";
+    const fd = new FormData();
+    fd.append("audio", blob, `speech.${ext}`);
+
+    micBtn.disabled = true;
+    micBtn.classList.add("transcribing");
+    setVoiceStatus("Got it, processing...", "Turning your words into text.");
+    try {
+      const res = await fetch(TRANSCRIBE_URL, { method: "POST", body: fd });
+      if (!res.ok) {
+        const errText = await res.text();
+        addError(`Could not transcribe (${res.status}): ${errText}`);
+        return;
+      }
+      const data = await res.json();
+      const text = (data.text || "").trim();
+      if (!text) {
+        addError("I couldn't hear anything. Try again — speak a bit louder, closer to the mic.");
+        return;
+      }
+      input.value = (input.value ? input.value.replace(/\s+$/, "") + " " : "") + text;
+      input.dispatchEvent(new Event("input"));
+      input.focus();
+      usedVoiceForThisMessage = true;  // gate TTS on this for the next reply
+    } catch (e) {
+      addError("Could not reach the server for transcription.");
+    } finally {
+      micBtn.disabled = false;
+      micBtn.classList.remove("transcribing");
+      setVoiceStatus("Tap the mic to speak", "Auto-stops after a short pause");
+    }
+  }
+
+  micBtn.addEventListener("click", () => {
+    if (isRecording) stopRecording(); else startRecording();
+  });
+
+  // ----- Text-to-Speech (speaker toggle in topbar) -----
+  function pickSGVoice() {
+    const voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
+    if (!voices.length) return null;
+
+    // Modern OSes ship two tiers of voices via the same SpeechSynthesis API:
+    // older robotic-sounding ones, and newer neural ones. The neural ones
+    // have telltale words in their `name`: "Natural" / "Online" / "Neural"
+    // (Windows 11), "Enhanced" / "Premium" / "Siri" (Mac/iOS), "Wavenet"
+    // (Chrome OS / Android). Filter to those first; fall through to anything
+    // English if none are installed.
+    const isNeural = v => /natural|online|neural|enhanced|premium|wavenet|siri/i.test(v.name);
+    const langPriority = ["en-SG", "en-AU", "en-GB", "en-US", "en-NZ"];
+
+    // 1. Best case: a neural voice in our preferred Singapore-ish accents.
+    for (const lang of langPriority) {
+      const v = voices.find(x => x.lang === lang && isNeural(x));
+      if (v) return v;
+    }
+    // 2. Any neural English voice (better-sounding even if accent is off).
+    const anyNeural = voices.find(v => isNeural(v) && v.lang && v.lang.startsWith("en"));
+    if (anyNeural) return anyNeural;
+    // 3. Any voice in our preferred languages (older, robotic).
+    for (const lang of langPriority) {
+      const v = voices.find(x => x.lang === lang);
+      if (v) return v;
+    }
+    // 4. Last resort.
+    return voices.find(v => v.lang && v.lang.startsWith("en")) || voices[0];
+  }
+
+  function speakReply(text) {
+    if (!speakOn || !("speechSynthesis" in window)) return;
+    // Strip markdown so the voice doesn't read out asterisks and hashes.
+    const clean = text
+      .replace(/```[\s\S]*?```/g, " ")
+      .replace(/\*\*([^*]+)\*\*/g, "$1")
+      .replace(/\*([^*]+)\*/g, "$1")
+      .replace(/`([^`]+)`/g, "$1")
+      .replace(/^#+\s*/gm, "")
+      .replace(/^\s*[-*]\s+/gm, "")
+      .replace(/^\s*\d+\.\s+/gm, "")
+      .replace(/\n{2,}/g, ". ");
+    const utter = new SpeechSynthesisUtterance(clean);
+    const v = pickSGVoice();
+    if (v) { utter.voice = v; utter.lang = v.lang; }
+    utter.rate = 0.95;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utter);
+  }
+
+  function updateSpeakerBtn() {
+    speakerLabel.textContent = speakOn ? "Voice reply: On" : "Voice reply: Off";
+    speakerBtn.classList.toggle("off", !speakOn);
+    speakerBtn.title = speakOn
+      ? "Replies are read aloud when you use the mic. Click to mute."
+      : "Replies are always silent. Click to enable voice replies.";
+  }
+  speakerBtn.addEventListener("click", () => {
+    speakOn = !speakOn;
+    localStorage.setItem(SPEAK_PREF_KEY, speakOn ? "on" : "off");
+    updateSpeakerBtn();
+    if (!speakOn && window.speechSynthesis) window.speechSynthesis.cancel();
+  });
+  updateSpeakerBtn();
+
+  // Voice list loads asynchronously on most browsers — touch it once so the
+  // first reply doesn't fall back to the default voice.
+  if ("speechSynthesis" in window) {
+    window.speechSynthesis.getVoices();
+    window.speechSynthesis.onvoiceschanged = () => {};
+  }
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = "";
+    input.style.height = "auto";
+    send(text);
+  });
+
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      form.requestSubmit();
+    }
+  });
+
+  input.addEventListener("input", () => {
+    input.style.height = "auto";
+    input.style.height = Math.min(input.scrollHeight, 200) + "px";
+  });
+
+  renderEmpty();
+</script>
+</body>
+</html>

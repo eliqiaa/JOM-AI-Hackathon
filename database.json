@@ -1,0 +1,50 @@
+{
+  "Food_and_Beverage": [
+    {
+      "name": "Tampines Round Market & Food Centre (Hawker Centre)",
+      "location": "Level 1, Hawker Centre Zone",
+      "description": "Bustling hawker centre with over 40 stalls. Affordable local favourites such as chicken rice, laksa, char kway teow, and economy rice. Best for budget-friendly meals and authentic Singaporean food. Typical price range: S$4 - S$7."
+    },
+    {
+      "name": "Tenderfresh Classic",
+      "location": "Level 1, #01-K3 (near Hawker Centre)",
+      "description": "Halal-certified Western food chain famous for crispy fried chicken, chicken chop, and fish & chips. Family-friendly with quick service. Typical price range: S$8 - S$14."
+    },
+    {
+      "name": "Kopitiam Food Court",
+      "location": "Basement 1, #B1-12",
+      "description": "Air-conditioned food court with a wide variety of stalls: Korean, Japanese, Thai, Indian, Muslim cuisine, and Chinese zi char. Good for groups with different food preferences. Typical price range: S$5 - S$10."
+    },
+    {
+      "name": "Toast Box",
+      "location": "Level 2, #02-18",
+      "description": "Local cafe serving traditional kaya toast, soft-boiled eggs, kopi, and laksa. Quiet spot for breakfast, light meals, or a coffee break between errands. Typical price range: S$3 - S$8."
+    },
+    {
+      "name": "Subway",
+      "location": "Level 1, #01-45",
+      "description": "Build-your-own sandwich and salad chain. Healthier grab-and-go option, suitable for vegetarians and those watching their diet. Typical price range: S$6 - S$10."
+    }
+  ],
+  "General_Service_Counters": [
+    {
+      "name": "ServiceSG Centre",
+      "location": "Level 1, #01-21",
+      "description": "One-stop counter for over 200 government services across multiple agencies. Walk-in or by appointment. Use this counter for broad government enquiries that don't fit one of the specific schemes at OTH.",
+      "handles": [
+        "CPF enquiries, statements, and withdrawal questions",
+        "IRAS tax matters and payment",
+        "MOM Work Pass and employment enquiries",
+        "SingPass / Corppass assistance and password reset",
+        "General HDB enquiries (specific HDB schemes have their own counter)",
+        "Application and collection of government letters",
+        "Help for seniors and digitally less-confident residents"
+      ]
+    }
+  ],
+  "Fallback": {
+    "name": "OTH Information Counter",
+    "location": "Level 1, Main Atrium (near the main entrance)",
+    "description": "General enquiries counter for anything not covered by the listed services. Friendly staff can direct visitors to the right agency or facility within OTH."
+  }
+}
