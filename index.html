@@ -4,12 +4,6 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>OTH Buddy</title>
-<!-- Silero VAD (speech-vs-noise classifier) — lazy-loaded on first mic use.
-     Used to auto-stop the mic only when the USER stops speaking, ignoring
-     background noise. Falls through to a level-based VAD if the model
-     can't be fetched (e.g. no internet). -->
-<script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.14.0/dist/ort.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@ricky0123/vad-web@0.0.22/dist/bundle.min.js"></script>
 <style>
   :root {
     --bg: #ffffff;
@@ -477,7 +471,6 @@
 
 <script>
   const API_URL = "/api/chat";
-  const TRANSCRIBE_URL = "/api/transcribe";
   const messagesEl = document.getElementById("messages");
   const form = document.getElementById("form");
   const input = document.getElementById("input");
@@ -491,30 +484,14 @@
   let history = [];
 
   // ----- Speech I/O state -----
-  let mediaRecorder = null;
-  let recordingChunks = [];
+  // STT uses the browser's built-in SpeechRecognition (Web Speech API) —
+  // free, in-browser, no audio upload, browser handles end-of-speech.
+  let recognition = null;
   let isRecording = false;
-  // Track whether the message currently being composed came from voice.
-  // Used to gate TTS — we only speak the reply if the user spoke first.
-  let usedVoiceForThisMessage = false;
-
-  // Voice Activity Detection. Two layers:
-  //  1. Silero VAD (a small neural net that classifies each ~30ms frame as
-  //     speech vs non-speech). Auto-stops the mic when the USER stops
-  //     speaking, ignoring background noise — AC hum, footsteps, music
-  //     etc. don't trigger it because they're not speech.
-  //  2. Level-based VAD (fallback). Used when Silero fails to load
-  //     (e.g. offline) — keeps the mic functional, just less smart.
-  let audioCtx = null;
-  let vadAnalyser = null;
-  let vadRafId = null;
-  let speechVad = null;          // Silero instance (when available)
-  let speechVadEndTimer = null;  // grace period after end-of-speech
-  const VAD_CALIBRATION_MS = 600;    // sample ambient noise over a longer window
-  const VAD_VOICE_MARGIN_DB = 9;     // voice = noise floor + this many dB (lower = more sensitive)
-  const VAD_SILENCE_MS = 3500;       // stop after this much silence (post-voice). Elderly speakers pause mid-sentence; 3.5s tolerates a thinking beat.
-  const VAD_MIN_RECORD_MS = 1500;    // don't auto-stop in the first 1.5s
-  const VAD_HARD_TIMEOUT_MS = 30000; // hard cap, in case VAD never settles
+  // Holds the currently-playing Gemini TTS audio so the speaker toggle can
+  // stop it mid-utterance. Null when nothing is playing or when we're on
+  // the speechSynthesis fallback path.
+  let currentTtsAudio = null;
 
   function setVoiceStatus(main, sub) {
     voiceStatus.innerHTML = `${main}<span class="voice-sub">${sub}</span>`;
@@ -703,12 +680,6 @@
   }
 
   async function send(message) {
-    // Snapshot whether voice was used for THIS message before resetting.
-    // TTS only fires when the user spoke their question — typed messages
-    // get a text-only reply.
-    const shouldSpeakReply = usedVoiceForThisMessage;
-    usedVoiceForThisMessage = false;
-
     addMessage(message, "user");
     history.push({ role: "user", content: message });
     const typingRow = addTyping();
@@ -730,7 +701,7 @@
       const reply = data.reply || "(empty reply)";
       addMessage(reply, "assistant");
       history.push({ role: "assistant", content: reply });
-      if (shouldSpeakReply) speakReply(reply);
+      speakReply(reply);
     } catch (e) {
       typingRow.remove();
       addError("Could not reach the server. Is uvicorn still running on port 8000?");
@@ -741,243 +712,72 @@
     }
   }
 
-  // ----- Speech-to-Text (mic button) -----
-  async function startRecording() {
-    if (!navigator.mediaDevices || !window.MediaRecorder) {
-      addError("Your browser does not support voice input. Please type instead.");
+  // ----- Speech-to-Text (mic button, browser Web Speech API) -----
+  // Uses the browser's built-in SpeechRecognition. No backend call, no audio
+  // upload — free and instant. The browser detects end-of-speech itself.
+  // Chrome/Edge: solid. Safari (recent): works. Firefox: not supported.
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  function startRecording() {
+    if (!SpeechRecognition) {
+      addError("Your browser does not support voice input. Try Chrome or Edge, or type instead.");
       return;
     }
     try {
-      // WebRTC audio constraints — tells the browser to apply built-in noise
-      // suppression + echo cancellation + auto gain to the mic stream, which
-      // helps a lot in noisy environments like a community hub atrium.
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          noiseSuppression: true,
-          echoCancellation: true,
-          autoGainControl: true,
-          channelCount: 1,
-        }
-      });
+      recognition = new SpeechRecognition();
+      // en-SG biases Chrome's recognizer toward Singapore English where it's
+      // shipped; browsers without it fall back to a generic English model.
+      recognition.lang = "en-SG";
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.maxAlternatives = 1;
 
-      mediaRecorder = new MediaRecorder(stream);
-      recordingChunks = [];
-      mediaRecorder.ondataavailable = (e) => {
-        if (e.data && e.data.size > 0) recordingChunks.push(e.data);
+      let finalText = "";
+      recognition.onresult = (e) => {
+        finalText = "";
+        for (let i = 0; i < e.results.length; i++) {
+          if (e.results[i].isFinal) finalText += e.results[i][0].transcript;
+        }
       };
-      mediaRecorder.onstop = async () => {
-        stream.getTracks().forEach(t => t.stop());
-        teardownVad();
-        const mime = mediaRecorder.mimeType || "audio/webm";
-        const blob = new Blob(recordingChunks, { type: mime });
-        await transcribeAndFill(blob, mime);
+      recognition.onerror = (e) => {
+        if (e.error === "not-allowed" || e.error === "service-not-allowed") {
+          addError("Microphone permission denied. Check your browser settings.");
+        } else if (e.error === "no-speech") {
+          addError("I couldn't hear anything. Try again — speak a bit louder.");
+        } else if (e.error !== "aborted") {
+          addError(`Speech recognition error: ${e.error}`);
+        }
       };
-      mediaRecorder.start();
+      recognition.onend = () => {
+        isRecording = false;
+        micBtn.classList.remove("recording");
+        micBtn.title = "Tap to speak";
+        setVoiceStatus("Tap the mic to speak", "Speak naturally");
+        recognition = null;
+
+        const text = finalText.trim();
+        if (text) {
+          input.value = (input.value ? input.value.replace(/\s+$/, "") + " " : "") + text;
+          input.dispatchEvent(new Event("input"));
+          input.focus();
+        }
+      };
+
+      recognition.start();
       isRecording = true;
       micBtn.classList.add("recording");
       micBtn.title = "Tap to stop";
-      setVoiceStatus("Listening...", "Speak naturally. I'll stop when you finish.");
-
-      // Prefer Silero (speech-vs-noise neural net). Fall back to level VAD
-      // if the model isn't available — that keeps the mic working in any
-      // environment, just less smart about distinguishing speech from noise.
-      const speechVadStarted = await tryStartSpeechVad(stream);
-      if (!speechVadStarted) startVad(stream);
+      setVoiceStatus("Listening...", "I'll stop when you pause.");
     } catch (err) {
-      addError("Microphone permission denied or unavailable. Check your browser settings.");
-    }
-  }
-
-  // ----- Silero speech VAD (preferred) -----
-  async function tryStartSpeechVad(stream) {
-    if (!window.vad || !window.vad.AudioNodeVAD) return false;
-    try {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      const source = audioCtx.createMediaStreamSource(stream);
-      speechVad = await window.vad.AudioNodeVAD.new(audioCtx, {
-        // Stricter than default so distant chatter / TV in the background
-        // doesn't accidentally trigger as "speech".
-        positiveSpeechThreshold: 0.6,
-        negativeSpeechThreshold: 0.35,
-        // ~30ms per frame. 24 frames ≈ 750ms — lets the user have a short
-        // mid-sentence pause without the VAD declaring speech ended.
-        redemptionFrames: 24,
-        minSpeechFrames: 3,
-        onSpeechStart: () => {
-          // If we'd queued a stop because they paused, cancel it — they
-          // resumed speaking before the grace window expired.
-          if (speechVadEndTimer) {
-            clearTimeout(speechVadEndTimer);
-            speechVadEndTimer = null;
-          }
-          setVoiceStatus("Listening...", "I'll stop after you finish.");
-        },
-        onSpeechEnd: () => {
-          // Don't stop instantly — wait 1.5s in case they're just taking a
-          // breath. If they speak again within that window, onSpeechStart
-          // fires and cancels this timer above.
-          if (speechVadEndTimer) clearTimeout(speechVadEndTimer);
-          speechVadEndTimer = setTimeout(() => {
-            if (isRecording) stopRecording();
-          }, 1500);
-        },
-        baseAssetPath: "https://cdn.jsdelivr.net/npm/@ricky0123/vad-web@0.0.22/dist/",
-        onnxWASMBasePath: "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.14.0/dist/",
-      });
-      speechVad.receive(source);
-      speechVad.start();
-      return true;
-    } catch (e) {
-      console.warn("Silero VAD setup failed, falling back to level VAD:", e);
-      if (audioCtx) { audioCtx.close().catch(() => {}); audioCtx = null; }
-      speechVad = null;
-      return false;
-    }
-  }
-
-  function teardownSpeechVad() {
-    if (speechVadEndTimer) { clearTimeout(speechVadEndTimer); speechVadEndTimer = null; }
-    if (speechVad) {
-      try { speechVad.pause(); } catch (e) {}
-      try { speechVad.destroy(); } catch (e) {}
-      speechVad = null;
+      addError("Could not start voice input. " + (err.message || ""));
+      isRecording = false;
+      micBtn.classList.remove("recording");
     }
   }
 
   function stopRecording() {
-    if (mediaRecorder && mediaRecorder.state === "recording") {
-      mediaRecorder.stop();
-    }
-    isRecording = false;
-    micBtn.classList.remove("recording");
-    micBtn.title = "Tap to speak";
-  }
-
-  // ----- Voice Activity Detection (adaptive to background noise) -----
-  function startVad(stream) {
-    try {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      const source = audioCtx.createMediaStreamSource(stream);
-      vadAnalyser = audioCtx.createAnalyser();
-      vadAnalyser.fftSize = 1024;
-      vadAnalyser.smoothingTimeConstant = 0.4;
-      source.connect(vadAnalyser);
-
-      const buf = new Uint8Array(vadAnalyser.fftSize);
-      const startedAt = Date.now();
-      const noiseSamples = [];
-      let noiseFloorDb = -50;   // updated after the calibration window
-      let calibrated = false;
-      let lastVoiceAt = Date.now();
-      let everHeardVoice = false;
-
-      const readDb = () => {
-        vadAnalyser.getByteTimeDomainData(buf);
-        let sum = 0;
-        for (let i = 0; i < buf.length; i++) {
-          const x = (buf[i] - 128) / 128;
-          sum += x * x;
-        }
-        const rms = Math.sqrt(sum / buf.length);
-        return 20 * Math.log10(Math.max(rms, 1e-6));
-      };
-
-      const tick = () => {
-        if (!isRecording) return;
-        const db = readDb();
-        const now = Date.now();
-        const elapsed = now - startedAt;
-
-        // Phase 1: measure ambient noise. We use the 20th-percentile sample
-        // (not the median) because elderly users often start speaking before
-        // the calibration window finishes — the median would then be biased
-        // upward by their voice. The 20th percentile catches the quiet
-        // moments between syllables, which is closer to the true noise floor.
-        if (!calibrated) {
-          noiseSamples.push(db);
-          if (elapsed >= VAD_CALIBRATION_MS) {
-            const sorted = [...noiseSamples].sort((a, b) => a - b);
-            noiseFloorDb = sorted[Math.floor(sorted.length * 0.2)];
-            calibrated = true;
-          }
-          vadRafId = requestAnimationFrame(tick);
-          return;
-        }
-
-        // Slowly track downward drift in the noise floor (e.g. the air-con
-        // turning off). Never adapt upward — that would let a long speech
-        // raise the floor and silence wouldn't register.
-        if (db < noiseFloorDb) {
-          noiseFloorDb = noiseFloorDb * 0.9 + db * 0.1;
-        }
-
-        const voiceThreshold = noiseFloorDb + VAD_VOICE_MARGIN_DB;
-        if (db > voiceThreshold) {
-          lastVoiceAt = now;
-          if (!everHeardVoice) {
-            everHeardVoice = true;
-            setVoiceStatus("Listening...", "I'll stop when you pause.");
-          }
-        }
-
-        const silenceFor = now - lastVoiceAt;
-        const shouldStop =
-          (everHeardVoice && elapsed > VAD_MIN_RECORD_MS && silenceFor > VAD_SILENCE_MS) ||
-          (elapsed > VAD_HARD_TIMEOUT_MS);
-        if (shouldStop) {
-          stopRecording();
-          return;
-        }
-        vadRafId = requestAnimationFrame(tick);
-      };
-      vadRafId = requestAnimationFrame(tick);
-    } catch (e) {
-      // VAD is a nice-to-have. If it fails, the mic still works manually.
-      console.warn("VAD setup failed:", e);
-    }
-  }
-
-  function teardownVad() {
-    teardownSpeechVad();
-    if (vadRafId) { cancelAnimationFrame(vadRafId); vadRafId = null; }
-    if (audioCtx) { audioCtx.close().catch(() => {}); audioCtx = null; }
-    vadAnalyser = null;
-  }
-
-  async function transcribeAndFill(blob, mime) {
-    const ext = mime.includes("mp4") ? "m4a"
-              : mime.includes("ogg") ? "ogg"
-              : mime.includes("wav") ? "wav"
-              : "webm";
-    const fd = new FormData();
-    fd.append("audio", blob, `speech.${ext}`);
-
-    micBtn.disabled = true;
-    micBtn.classList.add("transcribing");
-    setVoiceStatus("Got it, processing...", "Turning your words into text.");
-    try {
-      const res = await fetch(TRANSCRIBE_URL, { method: "POST", body: fd });
-      if (!res.ok) {
-        const errText = await res.text();
-        addError(`Could not transcribe (${res.status}): ${errText}`);
-        return;
-      }
-      const data = await res.json();
-      const text = (data.text || "").trim();
-      if (!text) {
-        addError("I couldn't hear anything. Try again — speak a bit louder, closer to the mic.");
-        return;
-      }
-      input.value = (input.value ? input.value.replace(/\s+$/, "") + " " : "") + text;
-      input.dispatchEvent(new Event("input"));
-      input.focus();
-      usedVoiceForThisMessage = true;  // gate TTS on this for the next reply
-    } catch (e) {
-      addError("Could not reach the server for transcription.");
-    } finally {
-      micBtn.disabled = false;
-      micBtn.classList.remove("transcribing");
-      setVoiceStatus("Tap the mic to speak", "Auto-stops after a short pause");
+    if (recognition) {
+      try { recognition.stop(); } catch (e) {}
     }
   }
 
@@ -1016,10 +816,8 @@
     return voices.find(v => v.lang && v.lang.startsWith("en")) || voices[0];
   }
 
-  function speakReply(text) {
-    if (!speakOn || !("speechSynthesis" in window)) return;
-    // Strip markdown so the voice doesn't read out asterisks and hashes.
-    const clean = text
+  function stripMarkdownForSpeech(text) {
+    return text
       .replace(/```[\s\S]*?```/g, " ")
       .replace(/\*\*([^*]+)\*\*/g, "$1")
       .replace(/\*([^*]+)\*/g, "$1")
@@ -1028,6 +826,10 @@
       .replace(/^\s*[-*]\s+/gm, "")
       .replace(/^\s*\d+\.\s+/gm, "")
       .replace(/\n{2,}/g, ". ");
+  }
+
+  function speakWithBrowser(clean) {
+    if (!("speechSynthesis" in window)) return;
     const utter = new SpeechSynthesisUtterance(clean);
     const v = pickSGVoice();
     if (v) { utter.voice = v; utter.lang = v.lang; }
@@ -1036,18 +838,65 @@
     window.speechSynthesis.speak(utter);
   }
 
+  async function speakReply(text) {
+    if (!speakOn) return;
+    const clean = stripMarkdownForSpeech(text);
+
+    // Try Gemini TTS first — warmer, more Singapore-accented voice. The
+    // backend returns 503 when GEMINI_API_KEY isn't set; in that case (and
+    // any other failure) we silently fall back to the browser voice so the
+    // reply is always spoken.
+    try {
+      const res = await fetch("/api/tts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: clean }),
+      });
+      if (res.ok) {
+        // Stop anything already playing (user sent two messages fast, or
+        // toggled speaker off and back on).
+        if (currentTtsAudio) { currentTtsAudio.pause(); currentTtsAudio = null; }
+        if (window.speechSynthesis) window.speechSynthesis.cancel();
+
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const audio = new Audio(url);
+        currentTtsAudio = audio;
+        const cleanup = () => {
+          URL.revokeObjectURL(url);
+          if (currentTtsAudio === audio) currentTtsAudio = null;
+        };
+        audio.onended = cleanup;
+        audio.onerror = cleanup;
+        // If the user toggled speaker off between request and response,
+        // bail out instead of starting playback.
+        if (!speakOn) { cleanup(); return; }
+        await audio.play();
+        return;
+      }
+      // Non-OK: fall through to the browser voice. 503 = key not set,
+      // 502 = Gemini errored — either way, fallback keeps the reply audible.
+    } catch (e) {
+      // Network error or backend down — fall through.
+    }
+    speakWithBrowser(clean);
+  }
+
   function updateSpeakerBtn() {
     speakerLabel.textContent = speakOn ? "Voice reply: On" : "Voice reply: Off";
     speakerBtn.classList.toggle("off", !speakOn);
     speakerBtn.title = speakOn
-      ? "Replies are read aloud when you use the mic. Click to mute."
-      : "Replies are always silent. Click to enable voice replies.";
+      ? "All replies are read aloud. Click to mute."
+      : "Replies are silent. Click to enable voice replies.";
   }
   speakerBtn.addEventListener("click", () => {
     speakOn = !speakOn;
     localStorage.setItem(SPEAK_PREF_KEY, speakOn ? "on" : "off");
     updateSpeakerBtn();
-    if (!speakOn && window.speechSynthesis) window.speechSynthesis.cancel();
+    if (!speakOn) {
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+      if (currentTtsAudio) { currentTtsAudio.pause(); currentTtsAudio = null; }
+    }
   });
   updateSpeakerBtn();
 
