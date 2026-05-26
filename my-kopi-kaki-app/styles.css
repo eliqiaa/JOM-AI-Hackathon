@@ -79,67 +79,71 @@ body {
 
 .home-container .enhanced-slideshow-container {
     flex: 0 0 auto;
-    height: 280px;
+    height: 380px;
 }
 
 /* Things to do at Tampines Hub */
 .things-to-do-section {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
 }
 
 .things-to-do-section .section-title {
-    font-size: 18px;
-    color: #8B4513;
-    margin: 0;
+    font-size: 16px;
+    color: var(--color-muted);
+    font-weight: 600;
+    margin: 4px 0 2px;
     text-align: left;
+    letter-spacing: 0.01em;
 }
 
 .news-slideshow-wrapper .section-title {
-    font-size: 18px;
-    color: #8B4513;
+    font-size: 20px;
+    color: var(--color-heading);
+    font-weight: 600;
     margin: 0 0 14px 0;
-    text-align: center;
+    text-align: left;
+    letter-spacing: -0.01em;
 }
 
 .things-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
 }
 
 .thing-card {
-    background: #FFF;
-    border-radius: 14px;
-    padding: 14px 8px;
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    padding: 10px 6px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 4px;
     text-align: center;
-    box-shadow: 0 4px 12px rgba(139, 69, 19, 0.10);
+    box-shadow: var(--shadow-sm);
     cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    aspect-ratio: 1 / 1;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    min-height: 76px;
 }
 
 .thing-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(139, 69, 19, 0.18);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
 }
 
 .thing-card .thing-icon {
-    font-size: 32px;
+    font-size: 22px;
     line-height: 1;
 }
 
 .thing-card .thing-label {
-    font-size: 11px;
+    font-size: 10.5px;
     font-weight: 600;
-    color: #4A4A4A;
-    line-height: 1.2;
+    color: var(--color-text);
+    line-height: 1.15;
 }
 
 .thing-food { background: linear-gradient(135deg, #FFF5E1, #FFE4B5); }
@@ -2686,4 +2690,290 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+}
+
+/* ===== Buddy voice-output toggle (top-right of buddy-header) ===== */
+.buddy-header {
+    position: relative;
+}
+
+.buddy-voice-toggle {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 38px;
+    height: 38px;
+    border-radius: var(--radius-pill);
+    border: 1.5px solid var(--color-divider);
+    background: var(--color-surface);
+    color: var(--color-brand);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-sm);
+    transition: background-color 0.15s ease, transform 0.1s ease, border-color 0.15s ease;
+}
+
+.buddy-voice-toggle:hover {
+    background: var(--color-brand-soft);
+    border-color: #C9A27D;
+}
+
+.buddy-voice-toggle:active {
+    transform: scale(0.95);
+}
+
+.buddy-voice-toggle.is-muted {
+    background: #F3E6D8;
+    color: var(--color-muted);
+    border-color: var(--color-divider);
+}
+
+/* ===== Site header / desktop top nav ===== */
+.site-header {
+    display: none;  /* default: hidden on mobile + during onboarding */
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 14px 32px;
+    background: rgba(255, 252, 246, 0.92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--color-divider);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+body.app-shell .site-header {
+    /* Only show once the user is past the onboarding flow */
+    display: none;  /* still hidden on mobile, overridden in desktop @media */
+}
+
+.site-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--color-heading);
+    font-family: inherit;
+}
+
+.site-brand-mark {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.site-brand-name {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--color-heading);
+}
+
+.site-nav {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.site-nav-link {
+    text-decoration: none;
+    color: var(--color-muted);
+    padding: 9px 16px;
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    font-size: 14.5px;
+    letter-spacing: 0.01em;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.site-nav-link:hover {
+    background: var(--color-brand-soft);
+    color: var(--color-heading);
+}
+
+.site-nav-link.is-active {
+    color: var(--color-brand);
+    background: var(--color-brand-soft);
+}
+
+.site-account {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--color-brand);
+    color: #FFF;
+    font-weight: 700;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* ===== Desktop layout (≥ 900 px): website-style polish ===== */
+@media (min-width: 900px) {
+    body.app-shell .site-header {
+        display: flex;
+    }
+
+    /* Hide the mobile bottom nav on desktop — the top nav takes over */
+    body.app-shell .bottom-nav {
+        display: none;
+    }
+
+    /* Pages on desktop get generous breathing room and centered max-width.
+       Onboarding pages stay vertically centered as before (signin / welcome
+       / interests still use the .container flex-center layout). */
+    body.app-shell .page {
+        padding: 32px 32px 60px;
+    }
+
+    body.app-shell .home-container {
+        max-width: 1080px;
+        padding-bottom: 60px;
+    }
+
+    body.app-shell .home-container .enhanced-slideshow-container {
+        height: 460px;
+    }
+
+    body.app-shell .news-slideshow-wrapper .section-title {
+        font-size: 24px;
+        margin-bottom: 18px;
+    }
+
+    body.app-shell .things-grid {
+        grid-template-columns: repeat(6, 1fr);
+        gap: 10px;
+    }
+
+    body.app-shell .thing-card {
+        min-height: 84px;
+        padding: 12px 6px;
+    }
+
+    body.app-shell .buddy-container {
+        max-width: 820px;
+        padding: 24px 32px;
+        background: var(--color-surface);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+    }
+
+    body.app-shell .buddy-messages {
+        padding: 20px 6px;
+        max-height: 60vh;
+    }
+
+    body.app-shell .interests-container,
+    body.app-shell .place-container {
+        max-width: 980px;
+    }
+
+    /* ----- Sign-in: 2-column desktop hero (illustration left, form right) ----- */
+    #signin-page.page {
+        padding: 48px 32px;
+    }
+
+    #signin-page .container {
+        max-width: 960px;
+        height: auto;
+        min-height: calc(100vh - 96px);
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 80px;
+        text-align: left;
+    }
+
+    #signin-page .logo {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+        margin: 0;
+    }
+
+    #signin-page .logo-img {
+        width: 260px;
+        height: auto;
+        margin-bottom: 0;
+    }
+
+    #signin-page .app-title {
+        font-size: 48px;
+        margin-bottom: 0;
+        letter-spacing: -0.02em;
+    }
+
+    #signin-page .logo::after {
+        content: "Your friendly concierge for everything at Our Tampines Hub. Government services, food, fitness, family programmes — one warm conversation away.";
+        font-size: 16px;
+        color: var(--color-muted);
+        line-height: 1.55;
+        max-width: 380px;
+        margin-top: 8px;
+    }
+
+    #signin-page .signin-form {
+        flex: 0 0 380px;
+        max-width: 380px;
+        padding: 36px 32px;
+        background: var(--color-surface);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+    }
+
+    #signin-page .version {
+        left: 32px;
+        bottom: 24px;
+    }
+
+    /* ----- Welcome page: bigger hero, cards in a row ----- */
+    #welcome-page .container {
+        max-width: 720px;
+        gap: 16px;
+    }
+
+    .welcome-title {
+        font-size: 52px;
+        margin-bottom: 16px;
+    }
+
+    .language-options {
+        max-width: 540px;
+        flex-direction: row;
+        gap: 14px;
+    }
+
+    .language-options .language-btn {
+        flex: 1;
+        font-size: 16px;
+        padding: 18px 12px;
+    }
+
+    /* ----- Interests: tighter grid on desktop ----- */
+    .interests-title {
+        font-size: 32px;
+    }
+}
+
+/* ===== Wide desktop (≥ 1200 px): expand further ===== */
+@media (min-width: 1200px) {
+    body.app-shell .site-header {
+        padding: 16px 56px;
+    }
+
+    body.app-shell .page {
+        padding: 40px 56px 60px;
+    }
 }

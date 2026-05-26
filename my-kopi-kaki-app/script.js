@@ -534,6 +534,10 @@ function personalizeFeed() {
 }
 
 // Page navigation function
+// Pages shown before the user is "inside" the app shell — these never
+// display the desktop top nav.
+const ONBOARDING_PAGES = ['signin-page', 'welcome-page', 'interests-page'];
+
 function showPage(pageId) {
     console.log('Showing page:', pageId);
     // Hide all pages
@@ -541,14 +545,22 @@ function showPage(pageId) {
     pages.forEach(page => {
         page.classList.remove('active');
     });
-    
+
     // Show the selected page
     const targetPage = document.getElementById(pageId);
     if (targetPage) {
         targetPage.classList.add('active');
     }
-    
-    // Update navigation buttons
+
+    // Desktop top nav: visible only once the user is past onboarding.
+    document.body.classList.toggle('app-shell', !ONBOARDING_PAGES.includes(pageId));
+
+    // Highlight the matching site-header link (desktop nav).
+    document.querySelectorAll('.site-nav-link').forEach(link => {
+        link.classList.toggle('is-active', link.dataset.pageTarget === pageId);
+    });
+
+    // Update navigation buttons (mobile bottom nav)
     const navButtons = document.querySelectorAll('.nav-btn');
     navButtons.forEach(btn => {
         btn.classList.remove('active');
@@ -1316,6 +1328,10 @@ async function sendBuddyMessage(userText) {
     if (!userText || !userText.trim()) return;
     userText = userText.trim();
 
+    // If Buddy is still speaking the previous reply, hush her — the user is
+    // moving on. Stays in sync with the new reply we're about to fetch.
+    stopCurrentBuddySpeech();
+
     addBuddyMessage('user', userText);
     const typingId = addBuddyMessage('assistant', 'Buddy is typing…', { typing: true });
 
@@ -1327,6 +1343,9 @@ async function sendBuddyMessage(userText) {
         if (services && services.length > 0) {
             addBuddyRoadmap(services);
         }
+        // Speak the textual reply only — the roadmap is visual and would be
+        // tedious read aloud. ElevenLabs first, browser TTS as fallback.
+        speakBuddyReply(reply);
     } catch (err) {
         console.error('Buddy error:', err);
         const typingEl = document.getElementById(typingId);
@@ -1561,73 +1580,404 @@ function sendBuddyForm(e) {
     sendBuddyMessage(text);
 }
 
-// ===== Buddy Voice Input (Web Speech API) =====
-let buddyRecognition = null;
-let buddyIsListening = false;
+// ===== Buddy Voice Output (ElevenLabs TTS via /api/tts, browser fallback) =====
+// The backend tries ElevenLabs first. Per main.py, /api/tts returns:
+//   200 + audio/mpeg → play the MP3 directly.
+//   503             → ELEVENLABS_API_KEY not set; silently fall back to
+//                     window.speechSynthesis so Buddy still has a voice.
+//   502             → ElevenLabs errored; also fall back silently.
+// We hold the playing Audio so a fresh reply cancels the previous one.
 
-function toggleBuddyVoice() {
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) {
-        alert("Sorry, voice input isn't supported in this browser. Please use Chrome or Edge, or type your message.");
-        return;
+let currentBuddyAudio = null;
+// User-controlled. Default ON; tap the speaker icon in the Buddy header to
+// flip. Persisted across reloads so the demo respects the user's choice.
+let buddyVoiceOn = (() => {
+    try {
+        const saved = localStorage.getItem('buddyVoiceOn');
+        return saved === null ? true : saved === 'true';
+    } catch (_) { return true; }
+})();
+
+function renderBuddyVoiceToggle() {
+    const btn = document.getElementById('buddyVoiceToggle');
+    if (!btn) return;
+    btn.classList.toggle('is-muted', !buddyVoiceOn);
+    btn.setAttribute('aria-pressed', String(buddyVoiceOn));
+    btn.setAttribute('aria-label', buddyVoiceOn ? 'Buddy speaks replies — tap to mute' : 'Buddy is muted — tap to enable voice replies');
+    btn.textContent = buddyVoiceOn ? '🔊' : '🔇';
+}
+
+function toggleBuddyVoiceOutput() {
+    buddyVoiceOn = !buddyVoiceOn;
+    try { localStorage.setItem('buddyVoiceOn', String(buddyVoiceOn)); } catch (_) {}
+    if (!buddyVoiceOn) stopCurrentBuddySpeech();
+    renderBuddyVoiceToggle();
+}
+
+document.addEventListener('DOMContentLoaded', renderBuddyVoiceToggle);
+
+function stopCurrentBuddySpeech() {
+    if (currentBuddyAudio) {
+        try { currentBuddyAudio.pause(); } catch (_) {}
+        currentBuddyAudio.src = '';
+        currentBuddyAudio = null;
     }
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+    }
+}
 
+// Modern OSes ship two tiers of voices through SpeechSynthesis: older
+// robotic ones and newer neural ones. The neural ones have telltale words
+// in `name`: "Natural" / "Online" / "Neural" (Windows 11), "Enhanced" /
+// "Premium" / "Siri" (Mac/iOS), "Wavenet" (Chrome OS / Android). We filter
+// for those first so Buddy doesn't sound like a 1990s phone tree.
+function pickBuddyVoice() {
+    if (!('speechSynthesis' in window)) return null;
+    const voices = window.speechSynthesis.getVoices();
+    if (!voices.length) return null;
+
+    const isNeural = v => /natural|online|neural|enhanced|premium|wavenet|siri/i.test(v.name);
+    const langPriority = (() => {
+        if (currentLanguage === 'zh') return ['zh-SG', 'zh-CN', 'zh-TW', 'zh-HK'];
+        if (currentLanguage === 'ms') return ['ms-MY', 'ms-SG', 'id-ID'];
+        return ['en-SG', 'en-AU', 'en-GB', 'en-US', 'en-NZ'];
+    })();
+
+    // 1. Neural voice in a preferred Singapore-ish accent.
+    for (const lang of langPriority) {
+        const v = voices.find(x => x.lang === lang && isNeural(x));
+        if (v) return v;
+    }
+    // 2. Any neural voice that matches the language prefix.
+    const langPrefix = langPriority[0].split('-')[0];
+    const anyNeural = voices.find(v => isNeural(v) && v.lang && v.lang.startsWith(langPrefix));
+    if (anyNeural) return anyNeural;
+    // 3. Any voice with one of our preferred accents (older / robotic).
+    for (const lang of langPriority) {
+        const v = voices.find(x => x.lang === lang);
+        if (v) return v;
+    }
+    // 4. Any voice matching the language prefix, then anything.
+    return voices.find(v => v.lang && v.lang.startsWith(langPrefix)) || voices[0];
+}
+
+function stripMarkdownForSpeech(text) {
+    return text
+        .replace(/```[\s\S]*?```/g, ' ')
+        .replace(/\*\*([^*]+)\*\*/g, '$1')
+        .replace(/\*([^*]+)\*/g, '$1')
+        .replace(/`([^`]+)`/g, '$1')
+        .replace(/^#+\s*/gm, '')
+        .replace(/^\s*[-*]\s+/gm, '')
+        .replace(/^\s*\d+\.\s+/gm, '')
+        .replace(/\n{2,}/g, '. ');
+}
+
+function speakWithBrowser(text) {
+    if (!('speechSynthesis' in window)) return;
+    const clean = stripMarkdownForSpeech(text);
+    const utter = new SpeechSynthesisUtterance(clean);
+    const v = pickBuddyVoice();
+    if (v) { utter.voice = v; utter.lang = v.lang; }
+    // 0.95 reads a touch slower than default — kinder to elderly listeners
+    // and to anyone parsing a roadmap of step instructions.
+    utter.rate = 0.95;
+    utter.pitch = 1.0;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utter);
+}
+
+// Voice list loads asynchronously on most browsers. Touch it once at boot
+// so the first Buddy reply doesn't default to the robotic system voice.
+if ('speechSynthesis' in window) {
+    window.speechSynthesis.getVoices();
+    window.speechSynthesis.onvoiceschanged = () => { /* triggers cache load */ };
+}
+
+async function speakBuddyReply(text) {
+    if (!buddyVoiceOn || !text) return;
+    stopCurrentBuddySpeech();
+
+    // Strip markdown so neither ElevenLabs nor the browser voice reads
+    // bullet asterisks, code fences, or hash headers out loud. Backend
+    // caps at 8000 chars; trim defensively (roadmap replies are short).
+    const speakText = stripMarkdownForSpeech(text).trim().slice(0, 7900);
+
+    try {
+        const resp = await fetch('/api/tts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: speakText }),
+        });
+        if (resp.ok) {
+            const blob = await resp.blob();
+            const url = URL.createObjectURL(blob);
+            const audio = new Audio(url);
+            currentBuddyAudio = audio;
+            audio.addEventListener('ended', () => {
+                URL.revokeObjectURL(url);
+                if (currentBuddyAudio === audio) currentBuddyAudio = null;
+            });
+            audio.addEventListener('error', () => {
+                URL.revokeObjectURL(url);
+                if (currentBuddyAudio === audio) currentBuddyAudio = null;
+                speakWithBrowser(speakText);
+            });
+            try {
+                await audio.play();
+                // Chrome can resolve audio.play() but immediately pause if
+                // user activation expired (silent autoplay block — no error
+                // event). Sanity-check after a tick; if it didn't start,
+                // fall through to speechSynthesis which is more permissive.
+                await new Promise(r => setTimeout(r, 150));
+                if (audio.paused && audio.currentTime === 0) {
+                    console.warn('Audio playback was silently blocked, falling back to speechSynthesis');
+                    URL.revokeObjectURL(url);
+                    if (currentBuddyAudio === audio) currentBuddyAudio = null;
+                    speakWithBrowser(speakText);
+                }
+            } catch (e) {
+                console.warn('audio.play() rejected, falling back:', e);
+                URL.revokeObjectURL(url);
+                if (currentBuddyAudio === audio) currentBuddyAudio = null;
+                speakWithBrowser(speakText);
+            }
+            return;
+        }
+        // 503 (not configured) or 502 (ElevenLabs errored): silent fallback.
+        speakWithBrowser(speakText);
+    } catch (_) {
+        // Network error reaching /api/tts — fall through to browser TTS.
+        speakWithBrowser(speakText);
+    }
+}
+
+// ===== Buddy Voice Input (MediaRecorder → /api/transcribe Whisper) =====
+// We previously used Chrome's Web Speech API, but that depends on Google's
+// cloud speech endpoint which corporate / public wifi (incl. typical
+// Singapore school + hackathon networks) frequently blocks. Switched to
+// MediaRecorder + the engineer's /api/transcribe Whisper proxy so all the
+// network traffic flows through our own backend — same path the chat
+// already uses, so if the chat works, the mic works.
+//
+// Silence detection runs locally via Web Audio API (no network), then we
+// auto-stop and ship the audio to /api/transcribe. Result is filled into
+// the input box and sent to /api/chat just like a typed message.
+
+let buddyMediaRecorder = null;
+let buddyAudioChunks = [];
+let buddyAudioStream = null;
+let buddyAudioContext = null;
+let buddyAnalyser = null;
+let buddyVadInterval = null;
+let buddyIsListening = false;
+let buddyLastSpeechAt = 0;
+let buddyStoppedByUser = false;
+
+// VAD tuning. The threshold is on the 0-255 byte-frequency scale; raise it
+// if quiet rooms still auto-stop too late, lower it if soft speakers get
+// cut off. SILENCE_MS is how long the audio must stay below threshold
+// before we treat the user as done.
+const BUDDY_VAD_THRESHOLD = 14;
+const BUDDY_VAD_INTERVAL_MS = 100;
+const BUDDY_SILENCE_MS = 4500;
+
+// Chrome's autoplay policy ties Audio.play() and speechSynthesis.speak() to
+// a recent user gesture (≈5 s grace). A voice round-trip (record → upload
+// → Whisper → /api/chat → reply) often busts that window, so Buddy's TTS
+// silently fails. Trick: prime both APIs synchronously inside the mic-tap
+// click handler so they're considered "user-activated" for the whole turn.
+function primeAudioForPlayback() {
+    try {
+        if ('speechSynthesis' in window) {
+            const u = new SpeechSynthesisUtterance('');
+            u.volume = 0;
+            window.speechSynthesis.speak(u);
+            window.speechSynthesis.cancel();
+        }
+    } catch (_) {}
+    try {
+        // A tiny silent WAV (44 bytes) as a data URL. Playing it under user
+        // activation unlocks <audio> playback for the rest of the gesture.
+        if (!window._buddyAudioPrimer) {
+            window._buddyAudioPrimer = new Audio(
+                'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA='
+            );
+        }
+        const a = window._buddyAudioPrimer;
+        a.muted = true;
+        const p = a.play();
+        if (p && typeof p.then === 'function') p.catch(() => {});
+    } catch (_) {}
+}
+
+async function toggleBuddyVoice() {
     const micBtn = document.getElementById('buddyMicBtn');
     const input = document.getElementById('buddyTextInput');
 
-    if (buddyIsListening && buddyRecognition) {
-        buddyRecognition.stop();
+    // Already recording → user wants to stop early. Mark it intentional so
+    // the recorder's onstop path doesn't double-fire confusing UX.
+    if (buddyIsListening) {
+        buddyStoppedByUser = true;
+        stopBuddyRecording();
         return;
     }
 
-    buddyRecognition = new SR();
-    // Match speech recognition to the user's selected language
-    const langMap = { en: 'en-SG', zh: 'zh-CN', ms: 'ms-MY' };
-    buddyRecognition.lang = langMap[currentLanguage] || 'en-SG';
-    buddyRecognition.continuous = false;
-    buddyRecognition.interimResults = true;
+    // We're inside a user-gesture handler — unlock TTS playback before the
+    // gesture's autoplay grace expires during the recording / upload window.
+    primeAudioForPlayback();
 
-    buddyRecognition.onstart = () => {
-        buddyIsListening = true;
-        micBtn.classList.add('listening');
-        input.placeholder = 'Listening…';
-    };
+    // Browser capability gate.
+    if (!navigator.mediaDevices || !window.MediaRecorder) {
+        addBuddyMessage('assistant', "Sorry, your browser doesn't support audio recording. Please type your question, or try Chrome/Edge.");
+        return;
+    }
 
-    buddyRecognition.onresult = (event) => {
-        let transcript = '';
-        for (let i = 0; i < event.results.length; i++) {
-            transcript += event.results[i][0].transcript;
+    // Acquire the mic. First call also surfaces the permission prompt.
+    try {
+        buddyAudioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch (e) {
+        if (e && (e.name === 'NotAllowedError' || e.name === 'SecurityError')) {
+            addBuddyMessage('assistant', "I can't hear you — your browser blocked microphone access. Tap the padlock icon in the address bar to allow the mic, then try again. You can also type your question.");
+        } else if (e && e.name === 'NotFoundError') {
+            addBuddyMessage('assistant', "I couldn't find a microphone on this device. Please type your question instead.");
+        } else {
+            addBuddyMessage('assistant', `Couldn't start the microphone: ${e?.message || e}. Please type your question.`);
         }
-        input.value = transcript;
-    };
+        return;
+    }
 
-    buddyRecognition.onerror = (event) => {
-        console.error('Speech recognition error:', event.error);
-        micBtn.classList.remove('listening');
-        buddyIsListening = false;
-        input.placeholder = 'Type your question...';
-        if (event.error === 'not-allowed') {
-            alert('Please allow microphone access to use voice input.');
-        }
-    };
-
-    buddyRecognition.onend = () => {
-        micBtn.classList.remove('listening');
-        buddyIsListening = false;
-        input.placeholder = 'Type your question...';
-        const finalText = input.value.trim();
-        if (finalText) {
-            input.value = '';
-            sendBuddyMessage(finalText);
-        }
-    };
+    buddyStoppedByUser = false;
+    buddyAudioChunks = [];
 
     try {
-        buddyRecognition.start();
+        buddyMediaRecorder = new MediaRecorder(buddyAudioStream);
     } catch (e) {
-        console.error('Could not start recognition:', e);
+        buddyAudioStream.getTracks().forEach(t => t.stop());
+        buddyAudioStream = null;
+        addBuddyMessage('assistant', `Couldn't start recording: ${e?.message || e}. Please type your question.`);
+        return;
+    }
+
+    buddyMediaRecorder.ondataavailable = (e) => {
+        if (e.data && e.data.size > 0) buddyAudioChunks.push(e.data);
+    };
+    buddyMediaRecorder.onstop = onBuddyRecordingDone;
+    buddyMediaRecorder.start();
+
+    // Web Audio analyser for local silence detection — no network required,
+    // unlike Web Speech API. We just sample the frequency data every 100 ms
+    // and check the average byte amplitude.
+    try {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        buddyAudioContext = new AC();
+        const source = buddyAudioContext.createMediaStreamSource(buddyAudioStream);
+        buddyAnalyser = buddyAudioContext.createAnalyser();
+        buddyAnalyser.fftSize = 1024;
+        source.connect(buddyAnalyser);
+    } catch (e) {
+        // VAD failed — fall back to a hard 30-second cap so the recording
+        // can't run forever. Better than nothing.
+        console.warn('Web Audio VAD unavailable, using time cap only:', e);
+        buddyAnalyser = null;
+    }
+
+    buddyIsListening = true;
+    micBtn.classList.add('listening');
+    input.placeholder = 'Listening… pause when you\'re done';
+    buddyLastSpeechAt = Date.now();  // grace period — user might say "hi" right away
+
+    const data = buddyAnalyser ? new Uint8Array(buddyAnalyser.frequencyBinCount) : null;
+    const startedAt = Date.now();
+    const HARD_CAP_MS = 60_000;  // never record longer than a minute
+
+    buddyVadInterval = setInterval(() => {
+        if (buddyAnalyser && data) {
+            buddyAnalyser.getByteFrequencyData(data);
+            // Average amplitude across the spectrum — simple but works
+            // well enough to distinguish quiet rooms from speech.
+            let sum = 0;
+            for (let i = 0; i < data.length; i++) sum += data[i];
+            const avg = sum / data.length;
+            if (avg > BUDDY_VAD_THRESHOLD) {
+                buddyLastSpeechAt = Date.now();
+            }
+        }
+        const sinceSpeech = Date.now() - buddyLastSpeechAt;
+        const sinceStart = Date.now() - startedAt;
+        if (sinceSpeech > BUDDY_SILENCE_MS || sinceStart > HARD_CAP_MS) {
+            stopBuddyRecording();
+        }
+    }, BUDDY_VAD_INTERVAL_MS);
+}
+
+function stopBuddyRecording() {
+    if (buddyVadInterval) { clearInterval(buddyVadInterval); buddyVadInterval = null; }
+    if (buddyMediaRecorder && buddyMediaRecorder.state !== 'inactive') {
+        try { buddyMediaRecorder.stop(); } catch (_) {}
+    }
+}
+
+async function onBuddyRecordingDone() {
+    const micBtn = document.getElementById('buddyMicBtn');
+    const input = document.getElementById('buddyTextInput');
+
+    // Tear down audio resources first so the mic indicator goes away even
+    // if the upload itself errors.
+    if (buddyAudioStream) {
+        buddyAudioStream.getTracks().forEach(t => t.stop());
+        buddyAudioStream = null;
+    }
+    if (buddyAudioContext) {
+        try { buddyAudioContext.close(); } catch (_) {}
+        buddyAudioContext = null;
+    }
+    buddyAnalyser = null;
+    buddyIsListening = false;
+
+    const chunks = buddyAudioChunks;
+    buddyAudioChunks = [];
+
+    if (!chunks.length) {
         micBtn.classList.remove('listening');
-        buddyIsListening = false;
+        input.placeholder = 'Type your question...';
+        return;
+    }
+
+    // Keep the pulse going through the transcribe call — it's a clear
+    // signal that the system is still working on the user's input.
+    input.placeholder = 'Transcribing…';
+
+    const mime = buddyMediaRecorder?.mimeType || 'audio/webm';
+    const blob = new Blob(chunks, { type: mime });
+    const ext = mime.includes('mp4') ? 'mp4' : mime.includes('ogg') ? 'ogg' : 'webm';
+
+    const fd = new FormData();
+    fd.append('audio', blob, 'speech.' + ext);
+
+    try {
+        const resp = await fetch('/api/transcribe', { method: 'POST', body: fd });
+        if (!resp.ok) {
+            const errText = await resp.text();
+            console.error('/api/transcribe error:', resp.status, errText);
+            addBuddyMessage('assistant', `I couldn't transcribe that (server returned ${resp.status}). Please type your question.`);
+            return;
+        }
+        const data = await resp.json();
+        const text = (data?.text || '').trim();
+        if (!text) {
+            addBuddyMessage('assistant', "I didn't catch any speech in that recording. Tap the mic and try again, or type your question.");
+            return;
+        }
+        input.value = '';
+        sendBuddyMessage(text);
+    } catch (e) {
+        console.error('Transcribe network error:', e);
+        addBuddyMessage('assistant', `Couldn't send your voice recording (${e?.message || e}). Please type your question.`);
+    } finally {
+        micBtn.classList.remove('listening');
+        input.placeholder = 'Type your question...';
     }
 }
 

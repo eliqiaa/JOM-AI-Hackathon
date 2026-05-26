@@ -10,6 +10,23 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- Site top navigation. Sticky on desktop ≥900px, hidden on mobile and
+         during onboarding (signin / welcome / interests). showPage() in
+         script.js toggles body.app-shell to drive visibility. -->
+    <header class="site-header" aria-label="OTH Buddy primary navigation">
+        <a class="site-brand" href="#" onclick="event.preventDefault(); showPage('home-page')">
+            <img src="images/mykopikaki.png" alt="" class="site-brand-mark">
+            <span class="site-brand-name">OTH Buddy</span>
+        </a>
+        <nav class="site-nav">
+            <a class="site-nav-link" href="#" onclick="event.preventDefault(); showPage('home-page')" data-page-target="home-page">Home</a>
+            <a class="site-nav-link" href="#" onclick="event.preventDefault(); showPage('companion-page')" data-page-target="companion-page">Buddy</a>
+            <a class="site-nav-link" href="#" onclick="event.preventDefault(); showPage('calendar-page')" data-page-target="calendar-page">Events</a>
+            <a class="site-nav-link" href="#" onclick="event.preventDefault(); showPage('directory-page')" data-page-target="directory-page">Directory</a>
+        </nav>
+        <div class="site-account" aria-label="Signed in">A</div>
+    </header>
+
     <!-- Sign In Page -->
     <div id="signin-page" class="page active">
         <div class="container">
@@ -529,6 +546,12 @@
     <div id="companion-page" class="page">
         <div class="buddy-container">
             <div class="buddy-header">
+                <button type="button"
+                        id="buddyVoiceToggle"
+                        class="buddy-voice-toggle"
+                        onclick="toggleBuddyVoiceOutput()"
+                        aria-pressed="true"
+                        aria-label="Buddy speaks replies — tap to mute">🔊</button>
                 <div class="buddy-avatar-circle">🤖</div>
                 <h2 class="buddy-greeting" data-translate="buddyGreeting">Hi! I'm Buddy</h2>
                 <p class="buddy-tagline" data-translate="buddyTagline">How can I help you today?</p>
