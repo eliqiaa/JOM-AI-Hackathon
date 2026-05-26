@@ -1356,9 +1356,10 @@ async function sendBuddyMessage(userText) {
 
 // ===== Buddy Roadmap UI =====
 // Each retrieved service from /api/chat becomes a numbered step card.
-// Cards expose two actions: Face-to-face (info modal) and Online (form modal).
-// Service objects are stashed on the button via a per-card closure so we
-// don't have to round-trip JSON through data attributes.
+// Cards expose up to two actions: Face-to-face (info modal with location +
+// hours + docs) and Online (direct anchor link to the official site, opens
+// in a new tab). The Online button is omitted entirely for services that
+// have no public website (most OTH facility tenants).
 
 function escapeHtml(s) {
     if (s == null) return '';
@@ -1399,6 +1400,10 @@ function addBuddyRoadmap(services) {
         const card = document.createElement('div');
         card.className = 'roadmap-card';
         const isPhysical = service.location_type === 'Physical_OTH';
+        const hasWebsite = !!service.website;
+        const onlineBtn = hasWebsite
+            ? `<a class="roadmap-btn roadmap-btn-online" href="${escapeHtml(service.website)}" target="_blank" rel="noopener noreferrer">Online ↗</a>`
+            : '';
         card.innerHTML = `
             <div class="roadmap-card-head">
                 <div class="roadmap-title">${escapeHtml(service.service_name)}</div>
@@ -1408,11 +1413,10 @@ function addBuddyRoadmap(services) {
             <div class="roadmap-loc">📍 ${escapeHtml(shortLocation(service))}</div>
             <div class="roadmap-actions">
                 <button type="button" class="roadmap-btn roadmap-btn-ftf">Face-to-face</button>
-                <button type="button" class="roadmap-btn roadmap-btn-online">Online</button>
+                ${onlineBtn}
             </div>
         `;
         card.querySelector('.roadmap-btn-ftf').addEventListener('click', () => openFtfModal(service));
-        card.querySelector('.roadmap-btn-online').addEventListener('click', () => openOnlineModal(service));
 
         step.appendChild(dot);
         step.appendChild(card);
@@ -1423,9 +1427,11 @@ function addBuddyRoadmap(services) {
     messagesEl.scrollTop = messagesEl.scrollHeight;
 }
 
-// ===== Buddy Service Modals =====
-// One modal element lives at the bottom of <body>. openFtfModal /
-// openOnlineModal swap its inner content; closeBuddyModal hides it.
+// ===== Buddy Service Modal (Face-to-face only) =====
+// One modal element lives at the bottom of <body>. openFtfModal swaps
+// its inner content; closeBuddyModal hides it. The Online action used to
+// open an iframe modal too, but we replaced it with a direct anchor link
+// to the official site (opens in a new tab), so no modal needed there.
 
 function ensureBuddyModal() {
     let modal = document.getElementById('buddyModal');
@@ -1507,67 +1513,6 @@ function openFtfModal(service) {
         </div>
     `, (body) => {
         body.querySelector('[data-close]').addEventListener('click', closeBuddyModal);
-    });
-}
-
-function openOnlineModal(service) {
-    // No mock form. The official site is the source of truth — we embed it
-    // and always expose an "Open in a new tab" anchor as the reliable path
-    // since most .gov.sg pages set X-Frame-Options: DENY and refuse to load
-    // inside an iframe. The 3-second load-watch reveals a helper hint when
-    // the iframe stays blank, so users know to use the new-tab anchor.
-    if (!service.website) {
-        const phoneHtml = service.phone ? `<a class="modal-link" href="tel:${escapeHtml(service.phone)}">${escapeHtml(service.phone)}</a>` : '<span class="modal-muted">No hotline listed</span>';
-        openBuddyModal(`
-            <div class="modal-eyebrow">Online · ${escapeHtml(service.agency)}</div>
-            <h2 class="modal-title">${escapeHtml(service.service_name)}</h2>
-            <p class="modal-lede">This service doesn't have an online portal — reach the team directly by phone.</p>
-            <div class="online-hotline-card">
-                <div class="online-hotline-label">Service hotline</div>
-                <div class="online-hotline-value">${phoneHtml}</div>
-            </div>
-            <div class="modal-actions">
-                <button type="button" class="modal-btn modal-btn-primary" data-close>Got it</button>
-            </div>
-        `, (body) => {
-            body.querySelector('[data-close]').addEventListener('click', closeBuddyModal);
-        });
-        return;
-    }
-
-    const url = service.website;
-    openBuddyModal(`
-        <div class="modal-eyebrow">Online · ${escapeHtml(service.agency)}</div>
-        <h2 class="modal-title">${escapeHtml(service.service_name)}</h2>
-        <p class="modal-lede">This is the official ${escapeHtml(service.agency)} page. Your details go straight to them — nothing passes through us.</p>
-        <div class="online-frame-wrap">
-            <iframe class="online-frame"
-                src="${escapeHtml(url)}"
-                sandbox="allow-forms allow-scripts allow-same-origin allow-popups"
-                referrerpolicy="no-referrer"
-                loading="lazy"
-                title="${escapeHtml(service.service_name)} — official site"></iframe>
-            <div class="online-frame-hint" hidden>
-                If the page above is blank, ${escapeHtml(service.agency)} blocks embedding — tap <strong>Open the official site</strong> below to continue on gov.sg.
-            </div>
-        </div>
-        <div class="online-frame-url">${escapeHtml(url)}</div>
-        <div class="modal-actions">
-            <button type="button" class="modal-btn modal-btn-ghost" data-close>Close</button>
-            <a class="modal-btn modal-btn-primary modal-btn-link"
-               href="${escapeHtml(url)}"
-               target="_blank"
-               rel="noopener">Open the official site ↗</a>
-        </div>
-    `, (body) => {
-        body.querySelector('[data-close]').addEventListener('click', closeBuddyModal);
-        const frame = body.querySelector('.online-frame');
-        const hint = body.querySelector('.online-frame-hint');
-        let loaded = false;
-        frame.addEventListener('load', () => { loaded = true; });
-        setTimeout(() => {
-            if (!loaded && hint) hint.hidden = false;
-        }, 3000);
     });
 }
 

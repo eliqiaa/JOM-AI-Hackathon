@@ -2397,10 +2397,21 @@ body {
     background: #FFF;
     color: #8B4513;
     border-color: #8B4513;
+    /* Anchor variant of the button — kill the default underline + ensure
+       flex centering so it lines up perfectly with the FTF <button>. */
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .roadmap-btn-online:hover {
     background: #FAF1E8;
+    text-decoration: none;
+}
+
+.roadmap-btn-online:visited {
+    color: #8B4513;
 }
 
 .roadmap-btn:active {

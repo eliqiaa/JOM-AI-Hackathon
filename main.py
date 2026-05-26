@@ -17,6 +17,7 @@ Data sources:
 
 import json
 import os
+import re
 from pathlib import Path
 from typing import Literal
 
@@ -230,6 +231,163 @@ class TTSRequest(BaseModel):
     text: str = Field(..., min_length=1, max_length=8000)
 
 
+# OTH non-government facilities (clinics, gym, library, etc.). When Buddy
+# mentions one of these by name in a reply, we synthesize a roadmap card
+# for it so the user sees it as a "location" alongside government-service
+# cards. The match_terms list is what we grep against the lower-cased
+# reply text — keep them short and distinctive.
+FACILITIES_DB: list[dict] = [
+    {
+        "service_id": "FAC-CHIRO-001",
+        "service_name": "Chiropractic Singapore",
+        "agency": "OTH tenant",
+        "oth_location": "Our Tampines Hub, B1-21. Walk-in or call ahead. Chiropractor for back, neck, leg, and joint issues.",
+        "match_terms": ["chiropractic singapore", "chiropractic", "b1-21"],
+        "appointment_required": True,
+    },
+    {
+        "service_id": "FAC-PHARMEX-001",
+        "service_name": "Pharmex Healthcare",
+        "agency": "OTH tenant",
+        "oth_location": "Our Tampines Hub, B1-02/03. Pharmacy for over-the-counter medication, prescriptions, basic medical supplies. Note: paid retail — use polyclinic / CHAS for subsidised meds.",
+        "match_terms": ["pharmex", "b1-02"],
+        "appointment_required": False,
+    },
+    {
+        "service_id": "FAC-POLYCLINIC-001",
+        "service_name": "Tampines Polyclinic",
+        "agency": "SingHealth",
+        "oth_location": "Tampines Polyclinic, ~5–7 min walk from OTH (21 Tampines Street 81). Subsidised GP care for citizens / PRs. Chronic-disease meds heavily subsidised under CHAS. Walk-in or book via HealthHub.",
+        "match_terms": ["tampines polyclinic", "polyclinic", "chas", "subsidised gp", "subsidized gp"],
+        "appointment_required": False,
+    },
+    {
+        "service_id": "FAC-GUARDIAN-001",
+        "service_name": "Guardian Pharmacy",
+        "agency": "OTH tenant",
+        "oth_location": "Our Tampines Hub, B1-29/30. Pharmacy and health & beauty.",
+        "match_terms": ["guardian pharmacy", "b1-29"],
+        "appointment_required": False,
+    },
+    {
+        "service_id": "FAC-DENTAL-001",
+        "service_name": "Q&M Dental Surgery",
+        "agency": "OTH tenant",
+        "oth_location": "Our Tampines Hub, 02-89. Dental check-ups, treatment, and minor procedures. Appointment recommended.",
+        "match_terms": ["q&m dental", "dental surgery", "02-89"],
+        "appointment_required": True,
+    },
+    {
+        "service_id": "FAC-VISION-001",
+        "service_name": "Pearl's Visioncare",
+        "agency": "OTH tenant",
+        "oth_location": "Our Tampines Hub, 01-87. Eye care, optical, frames and lenses.",
+        "match_terms": ["pearl's visioncare", "visioncare", "01-87"],
+        "appointment_required": False,
+    },
+    {
+        "service_id": "FAC-GYM-001",
+        "service_name": "Tampines Hub Sports Centre Gym",
+        "agency": "Sport Singapore",
+        "oth_location": "Our Tampines Hub Sports Centre, Level 2–3. Public gym with cardio + weights. Good for gentle rehab and recovery exercise. ActiveSG membership required.",
+        "match_terms": ["sports centre gym", "sports gym", "tampines hub gym", "oth gym"],
+        "appointment_required": False,
+    },
+    {
+        "service_id": "FAC-SWIM-001",
+        "service_name": "Tampines Hub Swimming Complex",
+        "agency": "Sport Singapore",
+        "oth_location": "Our Tampines Hub, Level 2. Pools for lap swim, leisure, and low-impact exercise — ideal for leg / joint recovery.",
+        "match_terms": ["swimming complex", "swimming pool", "tampines hub swimming"],
+        "appointment_required": False,
+    },
+    {
+        "service_id": "FAC-YOGA-001",
+        "service_name": "Yoga Inc",
+        "agency": "OTH tenant",
+        "oth_location": "Our Tampines Hub, B1-06/07. Group yoga classes, all levels welcome.",
+        "match_terms": ["yoga inc", "yoga class"],
+        "appointment_required": True,
+    },
+    {
+        "service_id": "FAC-LIBRARY-001",
+        "service_name": "Tampines Regional Library",
+        "agency": "NLB",
+        "oth_location": "Our Tampines Hub, Level 2–5. Books, magazines, quiet study spaces, kids' section.",
+        "match_terms": ["regional library", "tampines library", "library"],
+        "appointment_required": False,
+    },
+    {
+        "service_id": "FAC-WELLGARDEN-001",
+        "service_name": "Wellness Garden",
+        "agency": "OTH",
+        "oth_location": "Our Tampines Hub, Level 5. Outdoor garden, walking paths, seating — quiet fresh-air spot.",
+        "match_terms": ["wellness garden"],
+        "appointment_required": False,
+    },
+    {
+        "service_id": "FAC-PLAYTOPIA-001",
+        "service_name": "Playtopia by Pororo Park",
+        "agency": "OTH tenant",
+        "oth_location": "Our Tampines Hub, 03-02. Indoor playground for young children.",
+        "match_terms": ["playtopia", "pororo park", "03-02"],
+        "appointment_required": False,
+    },
+    {
+        "service_id": "FAC-NTUC-001",
+        "service_name": "NTUC FairPrice",
+        "agency": "OTH tenant",
+        "oth_location": "Our Tampines Hub, B1-01. Supermarket — groceries, fresh produce, household items.",
+        "match_terms": ["ntuc fairprice", "fairprice", "supermarket"],
+        "appointment_required": False,
+    },
+    {
+        "service_id": "FAC-CINEMA-001",
+        "service_name": "Filmgarde Cineplex",
+        "agency": "OTH tenant",
+        "oth_location": "Our Tampines Hub. Multiplex cinema, current releases, family-friendly screenings.",
+        "match_terms": ["filmgarde", "cineplex", "cinema"],
+        "appointment_required": False,
+    },
+]
+
+
+def match_facilities(reply: str) -> list[dict]:
+    """Return facility dicts for any whose match_terms appear in the
+    reply text. De-duplicates by service_id. Used to synthesize roadmap
+    cards for places Buddy mentioned that aren't in the retrieval set."""
+    if not reply:
+        return []
+    rl = reply.lower()
+    seen: set[str] = set()
+    matched: list[dict] = []
+    for fac in FACILITIES_DB:
+        if fac["service_id"] in seen:
+            continue
+        if any(term in rl for term in fac["match_terms"]):
+            seen.add(fac["service_id"])
+            matched.append(fac)
+    return matched
+
+
+def strip_markdown(text: str) -> str:
+    """Defence-in-depth: even with strict prompt instructions, gpt-4o-mini
+    occasionally leaks **bold**, ### headers, or - bullets. The frontend
+    renders raw text in chat bubbles, so markdown shows up literally as
+    asterisks and hash signs. Strip it server-side so the user always
+    sees clean prose regardless of how stubborn the model gets."""
+    if not text:
+        return text
+    text = re.sub(r"\*\*([^*]+)\*\*", r"\1", text)  # **bold**
+    text = re.sub(r"\*([^*\s][^*]*?)\*", r"\1", text)  # *italic* (avoid lone *)
+    text = re.sub(r"`+", "", text)
+    text = re.sub(r"^#+\s*", "", text, flags=re.MULTILINE)
+    # Asterisk / hyphen bullets at the start of a line — replace with empty.
+    # Numbered "1. " stays, since the roadmap uses it.
+    text = re.sub(r"^[ \t]*[\*\-]\s+", "", text, flags=re.MULTILINE)
+    return text
+
+
 def load_database() -> dict:
     with open(DATABASE_PATH, "r", encoding="utf-8") as f:
         return json.load(f)
@@ -327,18 +485,51 @@ def build_system_prompt(
 - Singaporean tone: friendly and clear, plain English. You may use light local terms ("kopi", "uncle/auntie") only when the user's message has the same vibe — never forced.
 - Many visitors are stressed (job loss, money worries, housing). Acknowledge their feelings before jumping into directions.
 
+# STEP 0 — MULTI-INTENT EXTRACTION (do this internally before writing a single word)
+The user's message often packs MULTIPLE problems into one sentence (Singlish, run-on, comma-separated, no paragraph breaks). Before you reply, enumerate every distinct problem they raised. Examples:
+
+User: "kena sack already, next week house loan due, my diabetes meds also finishing"
+  → Problem A: Job loss / no income → ComCare or WSG retraining
+  → Problem B: Housing loan due → HDB Tampines Branch (mortgage deferment)
+  → Problem C: Medication continuity for chronic illness with no income → Polyclinic + CHAS subsidy (NOT retail pharmacy)
+
+User: "father stroke, discharging from CGH next week, need hospital bed, also got 3 yr old need childcare"
+  → Problem A: Post-stroke home-care equipment / planning → AIC Care Connect
+  → Problem B: Childcare for 3-year-old → Family Nexus @ OTH (early childhood)
+  → Problem C: Financial check (caregiver may stop working) → ComCare or Caregiver Training Grant
+
+CRITICAL: each enumerated problem MUST become a numbered step in the roadmap, unless eligibility excludes it. NEVER drop a problem the user named. If you only address 2 out of 3 problems they raised, that is a FAILURE. The most common LLM error here is attention-drop on the middle clause of a long sentence — your defense against that is the enumeration above.
+
+# STEP 1 — FINANCIAL TRIAGE (apply before recommending healthcare or retail)
+If the user has signalled financial distress at ANY point in the conversation — words like: "no money", "broke", "pokai", "$X left in bank", "kena retrench", "kena sack", "lost my job", "cannot pay", "behind on bills", "very tight", "siao liao", "jialat", "tahan", "cannot tahan", "how to survive", "no income" — switch into financial-triage mode for ALL of their needs this conversation:
+
+- For HEALTHCARE: prefer SUBSIDIZED options over retail. A broke person needs the POLYCLINIC (Tampines Polyclinic, ~5 min walk from OTH) or a CHAS-accredited GP, NOT Pharmex / Guardian / Q&M Dental for paid treatment. Mention CHAS Blue/Orange card sign-up at ServiceSG Level 1 if they don't have one. Only suggest retail pharmacies for cheap OTC pain relief, never for chronic-illness medication.
+- For HOUSING: do NOT skip HDB. If they have a loan, mortgage, or rent issue, the HDB Tampines Branch (Level 3) is the deferment/restructure counter — name it explicitly.
+- For FOOD: mention NTUC FairPrice with CDC vouchers, the OTH Hawker Centre's cheap stalls — not premium F&B.
+- For CHILDCARE / KIDS: mention subsidized childcare via Family Nexus → ECDA registration, not private enrichment centres.
+
+This rule overrides ANY other recommendation logic. Do not put a broke user in front of a S$200 chiropractor bill or a S$80/visit retail clinic.
+
+# STEP 2 — SERVICESG HUMAN HANDOFF (the "I hate forms" rule)
+If the user signals ANY of the following — extreme stress, "don't ask me fill 100 page form", "I don't know computer", "ah ma cannot use SingPass", "scared of online", "I dunno how", "siao computer", "too many forms" — you MUST end your roadmap with this exact pattern:
+
+"Before you go, if all this admin feels too much, walk straight in to the ServiceSG Centre at Level 1, #01-21. The officers there will sit with you, do the SingPass typing for you, fill the forms together, and book you the right appointments. You don't have to do this alone."
+
+This is the safety net. People in distress often cannot self-serve digital forms — naming the human-officer counter explicitly is the difference between a wasted trip and actual help reaching their family.
+
 # Decision tree (read this FIRST, every turn)
 
 Classify the user's message into one of these buckets and act accordingly:
 
-1. **Food / drinks / makan** → use the F&B block (block 1). Recommend 2-3 specific places.
-2. **Specific scheme already in the retrieval block** (block 3) → use that block's data. Build a step-by-step route.
+1. **Food / drinks / makan** → use the F&B block (block 1). Recommend the F&B places that actually fit — not always 3; sometimes 1, sometimes 4. Show exactly what they need.
+2. **Specific scheme already in the retrieval block** (block 3) → use that block's data. Build a step-by-step route. Only include services the user actually qualifies for (see ELIGIBILITY GATE).
 3. **Broad government enquiry** (CPF, IRAS, SingPass, MOM, generic HDB question, general tax) → answer using the ServiceSG counter (block 2). NEVER say "I'm not sure" for these — ServiceSG is exactly the counter for them.
-4. **Scheme-specific details NOT in block 3** (e.g. "how much CPF can I withdraw at 55", "what's the latest BTO income ceiling", "MediShield Life premiums", "Workfare 2026 amounts") → call **web_search** to fetch current numbers/rules from .gov.sg, then route the user to the right counter (ServiceSG for CPF/IRAS/SingPass/MOM, HDB Tampines Branch for HDB, MSF SSO for financial help, WSG Careers Connect for jobs/SkillsFuture).
-5. **Non-government facility/amenity question** (food court closing time, lost-and-found, swimming pool, library, parking) → route to the {fallback_name} at {fallback_loc}.
-6. **Greeting / small talk / follow-up about a service already mentioned** → respond directly, no search, no routing.
+4. **Health, fitness, rehab, library, family-with-kids, retail, or other non-government need that maps to a place AT OTH** → use the OTH FACILITIES block (block 5). Recommend the specific tenant + unit number. Example: "uncle hurt his leg" → Chiropractic Singapore (B1-21) for assessment + Sports Centre Gym (Level 2-3) for gentle leg rehab + Pharmex Healthcare (B1-02/03) for pain meds, if relevant.
+5. **Scheme-specific details NOT in block 3** (e.g. "how much CPF can I withdraw at 55", "what's the latest BTO income ceiling", "MediShield Life premiums", "Workfare 2026 amounts") → call **web_search** to fetch current numbers/rules from .gov.sg, then route the user to the right counter (ServiceSG for CPF/IRAS/SingPass/MOM, HDB Tampines Branch for HDB, MSF SSO for financial help, WSG Careers Connect for jobs/SkillsFuture).
+6. **Unknown facility / amenity question** (food court closing time, lost-and-found, parking, anything you genuinely don't know) → route to the {fallback_name} at {fallback_loc}.
+7. **Greeting / small talk / follow-up about a service already mentioned** → respond directly, no search, no routing.
 
-The "I'm not sure" Information Counter handoff is ONLY for bucket 5. NEVER use it for any government / financial / scheme question.
+The "I'm not sure" Information Counter handoff is ONLY for bucket 6. NEVER use it for any government / financial / facility question you have data for in blocks 2–5.
 
 # Your sources of truth (consult in this order, then web search only if needed)
 
@@ -353,8 +544,46 @@ The "I'm not sure" Information Counter handoff is ONLY for bucket 5. NEVER use i
 ## 3. Specific schemes available at OTH counters (retrieval-filtered for THIS query)
 {services_block}
 {confidence_note}
-## 4. Information Counter (NON-government facility questions only — bucket 5 above)
-For genuine facility / amenity questions only, route to **{fallback_name}** at **{fallback_loc}**. Compose your own warm one-line message; do not use a stock phrase. Government / financial / scheme questions NEVER go here.
+## 4. Information Counter (only for facility / amenity questions you can't answer from blocks 2, 3, or 5)
+For genuine "I don't know" facility questions only, route to **{fallback_name}** at **{fallback_loc}**. Compose your own warm one-line message; do not use a stock phrase. Government / financial / scheme questions NEVER go here, and neither do facility questions you CAN answer from block 5.
+
+## 5. OTH facilities directory (tenants, gym, library, healthcare clinics — use for non-government needs that map to a place inside OTH)
+
+HEALTHCARE & WELLBEING
+- Pharmex Healthcare (B1-02/03) — pharmacy, OTC meds, prescriptions
+- Chiropractic Singapore (B1-21) — chiropractor, good for back / neck / leg / joint pain
+- Guardian (B1-29/30) — pharmacy
+- Pearl's Visioncare (01-87) — optical, eye care
+- Q&M Dental Surgery (02-89) — dental
+- Changi General Hospital — a short bus ride from OTH; for serious medical issues
+
+FITNESS, REHAB & MOVEMENT
+- Tampines Hub Sports Centre Gym (Level 2–3) — public gym, cardio + weights, suitable for gentle rehab and recovery exercise
+- Tampines Hub Swimming Complex (Level 2) — pools, low-impact exercise, ideal for leg / joint recovery
+- Tampines Hub Stadium — outdoor running track
+- Yoga Inc (B1-06/07) — gentle yoga
+- JH Kim Taekwondo (B1-14) — for kids' classes
+- Wellness Garden (Level 5) — quiet outdoor space, fresh air walks
+
+LIBRARY & QUIET SPACES
+- Tampines Regional Library (Level 2–5) — quiet, study, books, magazines
+- Wellness Garden (Level 5) — outdoor reading + walking
+
+FAMILY, KIDS & ENRICHMENT
+- Playtopia by Pororo Park (03-02) — kids playground
+- Tumble Joy Gymnastics (B1-11/12) — kids gymnastics
+- The Ballet School (B1-51) — ballet
+- The Rock School (02-81) — kids music
+- Cristofori Music School (02-88) — music
+- Filmgarde Cineplex — cinema for family outings
+
+RETAIL & EVERYDAY
+- NTUC FairPrice (B1-01) — supermarket
+- Timezone (B1-13) — arcade
+- POSB Bank (B1-20)
+- Cheers (01-01) — convenience store
+
+When you use this block, give the FACILITY NAME + UNIT NUMBER + one short reason it fits the user's need (1 sentence). Do NOT invent tenants that aren't in this list — if the user asks for something not here, say it's not currently at OTH and pivot to what IS.
 
 # Web search policy (the `web_search` tool)
 
@@ -410,13 +639,14 @@ Handle the government step first, then suggest 1-2 F&B options nearby on the sam
 - Structure every actionable answer like this:
     Line 1-2: warm acknowledgement of the user's situation (1-2 sentences, plain prose).
     Then a blank line.
-    Then numbered steps "1. ...", "2. ...", "3. ..." — each step is ONE service from block 3 (specific schemes) or block 2 (counters). One sentence per step is best, two max.
+    Then numbered steps "1. ...", "2. ..." — each step is ONE concrete place at OTH: a service from block 3, a counter from block 2, or a facility from block 5. One sentence per step is best, two max.
     Then a blank line.
     Closing line: one sentence of encouragement or a "bring NRIC" reminder.
-- Each numbered step in your text MUST correspond to a service the user can take action on at OTH. Do not number lines that aren't services.
+- The number of steps must match what the user actually needs — NOT a fixed 3. If two things solve their problem, give two. If one is enough, give one. If four are genuinely useful, give four. No padding, no trimming. Quality > quantity.
+- Each numbered step in your text MUST correspond to a real entry in block 2, 3, or 5. Do not number a line that isn't a place at OTH. Do not invent tenants or services.
 
 # OUT-OF-SCOPE RULE (STRICT)
-If part of the user's question has no matching service in block 3 above and is also not handled by the ServiceSG counter (block 2) — for example, buying a hospital bed, finding a wheelchair, choosing a babysitter, generic shopping, "where to find X product" — do NOT suggest external alternatives (Carousell, Shopee, Amazon, "google it", "check online", third-party shops). Acknowledge briefly that OTH doesn't offer that, and immediately pivot to the OTH services that DO help with the rest of the user's question. Never invent a step.
+"At OTH" includes EVERYTHING in blocks 1–5 — F&B, government counters, retrieved schemes, facilities, tenants. Recommend any of those when they fit. The OUT-OF-SCOPE rule only kicks in when the user's question maps to NONE of blocks 1–5 — for example, buying a hospital bed online, shopping for a specific brand we don't stock, or finding services in another town. In that case, do NOT suggest external alternatives (Carousell, Shopee, Amazon, "google it", "check online", third-party shops). Acknowledge briefly that OTH doesn't have that, and pivot to the OTH things that DO help with the rest of their question. Never invent a step.
 
 # ELIGIBILITY GATE (STRICT — no wasted trips)
 Every service in block 3 has structured eligibility: citizenship (citizen / PR / foreigner / any), age range (age_min, age_max), income ceiling per month (income_ceiling_monthly_sgd), employment status (employed / self_employed / unemployed / any), plus other_criteria. Before you put any service in the roadmap:
@@ -472,7 +702,12 @@ def chat(req: ChatRequest):
     except json.JSONDecodeError as e:
         raise HTTPException(status_code=500, detail=f"database.json is invalid: {e}")
 
-    retrieval = retrieve_services(last.content, user_context=None, top_k=3)
+    # top_k=5 gives the LLM a wider candidate pool so it can pick the
+    # truly relevant ones for THIS question (gym + chiro for a leg injury,
+    # vs WIS + Workfare for unemployment). The reply-name filter further
+    # down then trims the roadmap to only what Buddy actually named, so
+    # users see exactly as many cards as they need — no padding.
+    retrieval = retrieve_services(last.content, user_context=None, top_k=5)
 
     system_prompt = build_system_prompt(
         food=db.get("Food_and_Beverage", []),
@@ -505,7 +740,39 @@ def chat(req: ChatRequest):
     except Exception as e:
         raise HTTPException(status_code=502, detail=f"OpenAI request failed: {e}")
 
-    reply = (getattr(response, "output_text", "") or "").strip()
+    reply = strip_markdown((getattr(response, "output_text", "") or "").strip())
+
+    # Only surface roadmap cards for services Buddy ACTUALLY named in the
+    # reply. The retrieval layer hands us up to top_k candidates but the
+    # LLM frequently uses fewer (it skips ones the user doesn't qualify
+    # for, or that don't fit the question). We match on the full service
+    # name first, then on a salient 4-word prefix to catch truncations
+    # like "ComCare Long-Term Assistance (Public Assistance)" → "ComCare
+    # Long-Term Assistance". DELIBERATELY no longer match on the agency
+    # prefix (MSF/HDB/CPF) — that was firing on every sibling scheme.
+    reply_lower = reply.lower()
+    used_services = []
+    for r in retrieval.services:
+        s = r.service
+        name_lower = s.service_name.lower()
+        if name_lower in reply_lower:
+            used_services.append(r)
+            continue
+        # Strip parenthetical aliases for a tighter "salient" match.
+        name_no_paren = name_lower.split(" (")[0].strip()
+        if name_no_paren and name_no_paren != name_lower and name_no_paren in reply_lower:
+            used_services.append(r)
+            continue
+        words = name_no_paren.split()
+        if len(words) >= 3:
+            salient = " ".join(words[:3])
+            if len(salient) >= 12 and salient in reply_lower:
+                used_services.append(r)
+                continue
+        if s.service_id.lower() in reply_lower:
+            used_services.append(r)
+            continue
+
     cards = [
         ServiceCard(
             service_id=r.service.service_id,
@@ -521,8 +788,29 @@ def chat(req: ChatRequest):
             phone=r.service.contact.phone,
             website=r.service.contact.website,
         )
-        for r in retrieval.services
+        for r in used_services
     ]
+
+    # Also surface non-government facilities Buddy mentioned (gym, clinics,
+    # library, etc.) as roadmap cards. These aren't in the retrieval set
+    # because they're tenants, not government schemes — but the user wants
+    # to see them in the roadmap when they're part of the recommendation.
+    for fac in match_facilities(reply):
+        cards.append(ServiceCard(
+            service_id=fac["service_id"],
+            service_name=fac["service_name"],
+            agency=fac["agency"],
+            location_type="Physical_OTH",
+            oth_location=fac["oth_location"],
+            operating_hours={},
+            required_documents=[],
+            walk_in_accepted=True,
+            appointment_required=fac.get("appointment_required", False),
+            typical_processing_time="Walk-in (call ahead if appointment_required)",
+            phone=None,
+            website=None,
+        ))
+
     return ChatResponse(reply=reply, services=cards)
 
 
