@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTH Buddy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Sign In Page -->
+    <div id="signin-page" class="page active">
+        <div class="container">
+            <div class="logo">
+                <img src="images/mykopikaki.png" alt="OTH Buddy logo" class="logo-img">
+                <h1 class="app-title">OTH Buddy</h1>
+            </div>
+            
+            <form class="signin-form">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="xxxxxx@email.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="••••••••••••••••••••••" required>
+                </div>
+                
+                <a href="#" class="forgot-password">Forget password?</a>
+                
+                <button type="submit" class="signin-btn">Sign in</button>
+
+                <div class="or-divider">
+                    <span class="or-divider-line"></span>
+                    <span class="or-divider-text">or</span>
+                    <span class="or-divider-line"></span>
+                </div>
+
+                <div class="social-login">
+                    <button type="button" class="social-btn">
+                        <svg width="20" height="20" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                            <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/>
+                            <path fill="#FF3D00" d="m6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C16.318 4 9.656 8.337 6.306 14.691z"/>
+                            <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0 1 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"/>
+                            <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 0 1-4.087 5.571l.003-.002l6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z"/>
+                        </svg>
+                        Continue with Gmail
+                    </button>
+
+                    <button type="button" class="social-btn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path fill="#1877F2" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669c1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                        </svg>
+                        Continue with Facebook
+                    </button>
+
+                    <button type="button" class="social-btn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path fill="#25F4EE" d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74a2.89 2.89 0 0 1 2.31-4.64a2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.84-.1z" opacity=".7"/>
+                            <path fill="#000000" d="M20.59 5.69a4.83 4.83 0 0 1-3.77-4.25V1h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74a2.89 2.89 0 0 1 2.31-4.64a2.93 2.93 0 0 1 .88.13V8.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 6.8 19.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.84-.1z"/>
+                            <path fill="#FE2C55" d="M21.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74a2.89 2.89 0 0 1 2.31-4.64a2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 7.8 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.84-.1z" opacity=".7"/>
+                        </svg>
+                        Continue with TikTok
+                    </button>
+                </div>
+
+                <p class="signup-link">Don't have an account? <a href="#" onclick="showPage('welcome-page')">Sign Up</a></p>
+            </form>
+            
+            <div class="version">Version 1.2</div>
+        </div>
+    </div>
+
+    <!-- Welcome/Language Selection Page -->
+    <div id="welcome-page" class="page">
+        <div class="container">
+            <h1 class="welcome-title" data-translate="welcomeTitle">Welcome!</h1>
+
+            <div class="language-options">
+                <button class="language-btn" onclick="setLanguage('en')" data-translate="englishButton">English</button>
+                <button class="language-btn" onclick="setLanguage('zh')" data-translate="chineseButton">中文</button>
+                <button class="language-btn" onclick="setLanguage('ms')" data-translate="malayButton">Bahasa Melayu</button>
+            </div>
+            </div>
+    </div>
+
+    <!-- Interests Selection Page -->
+    <div id="interests-page" class="page">
+        <button class="skip-btn" onclick="skipInterests()" data-translate="skipBtn">Skip</button>
+        <div class="interests-container">
+            <h1 class="interests-title" data-translate="interestsTitle">What are you interested in?</h1>
+            <p class="interests-subtitle" data-translate="interestsSubtitle">Pick a few to personalise your feed at Tampines Hub</p>
+
+            <div class="interests-grid">
+                <div class="interest-card" data-interest="food" onclick="toggleInterest(this)">
+                    <span class="interest-icon">🍴</span>
+                    <span class="interest-label" data-translate="interestFood">Food</span>
+                </div>
+                <div class="interest-card" data-interest="fitness" onclick="toggleInterest(this)">
+                    <span class="interest-icon">💪</span>
+                    <span class="interest-label" data-translate="interestFitness">Fitness</span>
+                </div>
+                <div class="interest-card" data-interest="healthcare" onclick="toggleInterest(this)">
+                    <span class="interest-icon">🏥</span>
+                    <span class="interest-label" data-translate="interestHealthcare">Healthcare</span>
+                </div>
+                <div class="interest-card" data-interest="financial" onclick="toggleInterest(this)">
+                    <span class="interest-icon">💰</span>
+                    <span class="interest-label" data-translate="interestFinancial">Financial Services</span>
+                </div>
+                <div class="interest-card" data-interest="movies" onclick="toggleInterest(this)">
+                    <span class="interest-icon">🎬</span>
+                    <span class="interest-label" data-translate="interestMovies">Movies</span>
+                </div>
+                <div class="interest-card" data-interest="library" onclick="toggleInterest(this)">
+                    <span class="interest-icon">📚</span>
+                    <span class="interest-label" data-translate="interestLibrary">Library</span>
+                </div>
+                <div class="interest-card" data-interest="shopping" onclick="toggleInterest(this)">
+                    <span class="interest-icon">🛍️</span>
+                    <span class="interest-label" data-translate="interestShopping">Shopping</span>
+                </div>
+                <div class="interest-card" data-interest="arts" onclick="toggleInterest(this)">
+                    <span class="interest-icon">🎨</span>
+                    <span class="interest-label" data-translate="interestArts">Arts &amp; Culture</span>
+                </div>
+                <div class="interest-card" data-interest="nature" onclick="toggleInterest(this)">
+                    <span class="interest-icon">🌳</span>
+                    <span class="interest-label" data-translate="interestNature">Parks &amp; Nature</span>
+                </div>
+                <div class="interest-card" data-interest="community" onclick="toggleInterest(this)">
+                    <span class="interest-icon">🎉</span>
+                    <span class="interest-label" data-translate="interestCommunity">Community Events</span>
+                </div>
+                <div class="interest-card" data-interest="swimming" onclick="toggleInterest(this)">
+                    <span class="interest-icon">🏊</span>
+                    <span class="interest-label" data-translate="interestSwimming">Swimming</span>
+                </div>
+                <div class="interest-card" data-interest="dance" onclick="toggleInterest(this)">
+                    <span class="interest-icon">💃</span>
+                    <span class="interest-label" data-translate="interestDance">Dance</span>
+                </div>
+                <div class="interest-card" data-interest="family" onclick="toggleInterest(this)">
+                    <span class="interest-icon">👨‍👩‍👧</span>
+                    <span class="interest-label" data-translate="interestFamily">Family &amp; Kids</span>
+                </div>
+                <div class="interest-card" data-interest="education" onclick="toggleInterest(this)">
+                    <span class="interest-icon">🎓</span>
+                    <span class="interest-label" data-translate="interestEducation">Education</span>
+                </div>
+            </div>
+
+            <button class="interests-continue-btn" onclick="saveInterestsAndContinue()" data-translate="continueBtn">Continue</button>
+        </div>
+    </div>
+
+    <!-- Home Page with Horizontal News Slideshow -->
+    <div id="home-page" class="page">
+        <div class="home-container">
+            <!-- Enhanced Horizontal News Slideshow Section -->
+            <div class="news-slideshow-wrapper">
+                <h2 class="section-title" data-translate="eventsHappeningSoon">Events happening soon</h2>
+                
+                <div class="enhanced-slideshow-container">
+                    <div class="slideshow-viewport">
+                        <div class="enhanced-slides-track" id="enhancedSlidesTrack">
+                            <!-- Event 1 - Fitness at Our Tampines Hub -->
+                            <div class="enhanced-news-slide" data-category="fitness community" data-event-id="fitness">
+                                <div class="slide-background">
+                                    <img src="images/fitness.jpg" alt="Fitness at Our Tampines Hub" class="slide-bg-image">
+                                    <div class="slide-overlay"></div>
+                                </div>
+                                <div class="slide-content-overlay">
+                                    <div class="category-badge fitness" data-translate="fitness">Fitness</div>
+                                    <h3 class="slide-main-title" data-translate="othFitnessTitle">Keep Fit @ Our Tampines Hub</h3>
+                                    <p class="slide-subtitle" data-translate="othFitnessSubtitle">Workouts at Gate 1</p>
+                                    <p class="slide-description" data-translate="othFitnessDescription">Stay active and join workouts of various intensity levels at Our Tampines Hub Gate 1. No pre-registration required — first-come, first-served (max 35 pax without equipment, 20 with).</p>
+                                    <div class="slide-action">
+                                        <button class="read-more-btn" data-translate="readMoreButton" onclick="openEventModal(this.closest('.enhanced-news-slide').dataset.eventId)">Read More</button>
+                                        <div class="slide-meta">
+                                            <span class="author" data-translate="byOTH">By Our Tampines Hub</span>
+                                            <span class="read-time" data-translate="freeEntry">Free entry</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Event 2 - Movie Night: Wicked -->
+                            <div class="enhanced-news-slide" data-category="movies community family" data-event-id="wicked">
+                                <div class="slide-background">
+                                    <img src="images/movie.jpg" alt="Movie Night Wicked" class="slide-bg-image">
+                                    <div class="slide-overlay"></div>
+                                </div>
+                                <div class="slide-content-overlay">
+                                    <div class="category-badge lifestyle" data-translate="movie">Movie</div>
+                                    <h3 class="slide-main-title" data-translate="wickedTitle">Movie Night: Wicked</h3>
+                                    <p class="slide-subtitle" data-translate="wickedSubtitle">Tampines Changkat CC</p>
+                                    <p class="slide-description" data-translate="wickedDescription">Join us for a magical movie night featuring "Wicked" on the big screen. Bring family and friends for an evening of fun, laughter and community bonding.</p>
+                                    <div class="slide-action">
+                                        <button class="read-more-btn" data-translate="readMoreButton" onclick="openEventModal(this.closest('.enhanced-news-slide').dataset.eventId)">Read More</button>
+                                        <div class="slide-meta">
+                                            <span class="author" data-translate="byChangkatCC">By Tampines Changkat CC</span>
+                                            <span class="read-time" data-translate="wickedRegister">go.gov.sg/tckmcmay26</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Event 3 - Storytelling: The Girl, Grandpa and Ox -->
+                            <div class="enhanced-news-slide" data-category="arts community family" data-event-id="grandpaOx">
+                                <div class="slide-background">
+                                    <img src="images/stories.jpg" alt="The Girl, Grandpa and Ox" class="slide-bg-image">
+                                    <div class="slide-overlay"></div>
+                                </div>
+                                <div class="slide-content-overlay">
+                                    <div class="category-badge community" data-translate="storytelling">Storytelling</div>
+                                    <h3 class="slide-main-title" data-translate="grandpaOxTitle">The Girl, Grandpa and Ox</h3>
+                                    <p class="slide-subtitle" data-translate="grandpaOxSubtitle">OTH Wellness Garden, L5</p>
+                                    <p class="slide-description" data-translate="grandpaOxDescription">Granddaughter and Grandpa set off on foot to sell their Ox at the faraway market. Along the way, strangers give them opposite ideas on how to travel — will the three arrive safely?</p>
+                                    <div class="slide-action">
+                                        <button class="read-more-btn" data-translate="readMoreButton" onclick="openEventModal(this.closest('.enhanced-news-slide').dataset.eventId)">Read More</button>
+                                        <div class="slide-meta">
+                                            <span class="author" data-translate="byOTH">By Our Tampines Hub</span>
+                                            <span class="read-time" data-translate="grandpaOxDate">23 May, 6-7pm</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Event 4 - Family Sports Day -->
+                            <div class="enhanced-news-slide" data-category="fitness community family" data-event-id="familySports">
+                                <div class="slide-background">
+                                    <img src="images/familysportsday.jpg" alt="Family Sports Day" class="slide-bg-image">
+                                    <div class="slide-overlay"></div>
+                                </div>
+                                <div class="slide-content-overlay">
+                                    <div class="category-badge health" data-translate="family">Family</div>
+                                    <h3 class="slide-main-title" data-translate="familySportsTitle">Family Sports Day</h3>
+                                    <p class="slide-subtitle" data-translate="familySportsSubtitle">SPACE @ OTH, Level 2</p>
+                                    <p class="slide-description" data-translate="familySportsDescription">A fun-packed afternoon for parents and children to get active together. Mass Workout, Target Toss, Jenga, Mini Sports & Obstacle Course. FREE goodie bags + Lucky Draw. Just $2 per pax.</p>
+                                    <div class="slide-action">
+                                        <button class="read-more-btn" data-translate="readMoreButton" onclick="openEventModal(this.closest('.enhanced-news-slide').dataset.eventId)">Read More</button>
+                                        <div class="slide-meta">
+                                            <span class="author" data-translate="byParkviewRN">By Tampines Parkview RN</span>
+                                            <span class="read-time" data-translate="familySportsDate">30 May, 10am-2pm</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Event 5 - Chinese Street Dance Finals -->
+                            <div class="enhanced-news-slide" data-category="dance community" data-event-id="streetDance">
+                                <div class="slide-background">
+                                    <img src="images/chinesestreetdance.jpg" alt="Chinese Street Dance Finals" class="slide-bg-image">
+                                    <div class="slide-overlay"></div>
+                                </div>
+                                <div class="slide-content-overlay">
+                                    <div class="category-badge entertainment" data-translate="dance">Dance</div>
+                                    <h3 class="slide-main-title" data-translate="streetDanceTitle">Chinese Street Dance Finals</h3>
+                                    <p class="slide-subtitle" data-translate="streetDanceSubtitle">爱上华文街舞比赛 2026</p>
+                                    <p class="slide-description" data-translate="streetDanceDescription">Grand Finals heading to Our Tampines Hub! High-octane energy from secondary school students. Come scream for your favourite team and catch the weekend 正能量 (positive energy).</p>
+                                    <div class="slide-action">
+                                        <button class="read-more-btn" data-translate="readMoreButton" onclick="openEventModal(this.closest('.enhanced-news-slide').dataset.eventId)">Read More</button>
+                                        <div class="slide-meta">
+                                            <span class="author" data-translate="byOTH">By Our Tampines Hub</span>
+                                            <span class="read-time" data-translate="streetDanceDate">23 May, 2pm</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Event 6 - LTA PMA Regulations Talk -->
+                            <div class="enhanced-news-slide" data-category="healthcare education community" data-event-id="ltaTalk">
+                                <div class="slide-background">
+                                    <img src="images/LTAtalk.jpg" alt="LTA PMA Regulations Talk" class="slide-bg-image">
+                                    <div class="slide-overlay"></div>
+                                </div>
+                                <div class="slide-content-overlay">
+                                    <div class="category-badge technology" data-translate="education">Education</div>
+                                    <h3 class="slide-main-title" data-translate="ltaTalkTitle">New PMA Regulations Talk</h3>
+                                    <p class="slide-subtitle" data-translate="ltaTalkSubtitle">ESH@Tampines × LTA</p>
+                                    <p class="slide-description" data-translate="ltaTalkDescription">For PMA users and caregivers — learn about Singapore's new speed limit rules, medical certification requirements, and safe usage on public paths before regulations take effect.</p>
+                                    <div class="slide-action">
+                                        <button class="read-more-btn" data-translate="readMoreButton" onclick="openEventModal(this.closest('.enhanced-news-slide').dataset.eventId)">Read More</button>
+                                        <div class="slide-meta">
+                                            <span class="author" data-translate="byESH">By ESH@Tampines</span>
+                                            <span class="read-time" data-translate="ltaTalkRegister">bit.ly/4dlRcAD</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Event 7 - Basic Manga Art -->
+                            <div class="enhanced-news-slide" data-category="arts education family community" data-event-id="manga">
+                                <div class="slide-background">
+                                    <img src="images/manga.jpg" alt="Basic Manga Art" class="slide-bg-image">
+                                    <div class="slide-overlay"></div>
+                                </div>
+                                <div class="slide-content-overlay">
+                                    <div class="category-badge technology" data-translate="workshop">Workshop</div>
+                                    <h3 class="slide-main-title" data-translate="mangaTitle">Basic Manga Art</h3>
+                                    <p class="slide-subtitle" data-translate="mangaSubtitle">June Holidays · Tampines North</p>
+                                    <p class="slide-description" data-translate="mangaDescription">Give your child a creative June-holiday adventure. 8 fun sessions learning to draw their own manga characters from scratch. Spots filling up fast!</p>
+                                    <div class="slide-action">
+                                        <button class="read-more-btn" data-translate="readMoreButton" onclick="openEventModal(this.closest('.enhanced-news-slide').dataset.eventId)">Read More</button>
+                                        <div class="slide-meta">
+                                            <span class="author" data-translate="byTampinesNorth">By Tampines North</span>
+                                            <span class="read-time" data-translate="mangaLink">onepa.gov.sg</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Event 8 - Make A Plushie -->
+                            <div class="enhanced-news-slide" data-category="arts family community" data-event-id="plushie">
+                                <div class="slide-background">
+                                    <img src="images/plushie.jpg" alt="Make A Plushie Workshop" class="slide-bg-image">
+                                    <div class="slide-overlay"></div>
+                                </div>
+                                <div class="slide-content-overlay">
+                                    <div class="category-badge lifestyle" data-translate="workshop">Workshop</div>
+                                    <h3 class="slide-main-title" data-translate="plushieTitle">Make A Plushie</h3>
+                                    <p class="slide-subtitle" data-translate="plushieSubtitle">June Holidays · Tampines North</p>
+                                    <p class="slide-description" data-translate="plushieDescription">Craft and bring home your very own handmade plushie. A perfect creative session for kids to explore their imagination and make lasting memories with friends.</p>
+                                    <div class="slide-action">
+                                        <button class="read-more-btn" data-translate="readMoreButton" onclick="openEventModal(this.closest('.enhanced-news-slide').dataset.eventId)">Read More</button>
+                                        <div class="slide-meta">
+                                            <span class="author" data-translate="byTampinesNorth">By Tampines North</span>
+                                            <span class="read-time" data-translate="plushieLink">onepa.gov.sg</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Event 9 - Crochet Workshop -->
+                            <div class="enhanced-news-slide" data-category="arts community" data-event-id="crochet">
+                                <div class="slide-background">
+                                    <img src="images/crochet.jpg" alt="Crochet Workshop" class="slide-bg-image">
+                                    <div class="slide-overlay"></div>
+                                </div>
+                                <div class="slide-content-overlay">
+                                    <div class="category-badge lifestyle" data-translate="workshop">Workshop</div>
+                                    <h3 class="slide-main-title" data-translate="crochetTitle">Crochet Your Own Flower</h3>
+                                    <p class="slide-subtitle" data-translate="crochetSubtitle">Function Room 2, L4</p>
+                                    <p class="slide-description" data-translate="crochetDescription">Experience the art of crochet and create a beautiful handmade flower. All materials provided with step-by-step guidance — perfect for beginners and craft lovers alike.</p>
+                                    <div class="slide-action">
+                                        <button class="read-more-btn" data-translate="readMoreButton" onclick="openEventModal(this.closest('.enhanced-news-slide').dataset.eventId)">Read More</button>
+                                        <div class="slide-meta">
+                                            <span class="author" data-translate="byOTH">By Our Tampines Hub</span>
+                                            <span class="read-time" data-translate="crochetDate">24 May, 10-11am</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Event 10 - Scented Sachet Making -->
+                            <div class="enhanced-news-slide" data-category="arts nature community" data-event-id="sachet">
+                                <div class="slide-background">
+                                    <img src="images/sachet.jpg" alt="Scented Sachet Making" class="slide-bg-image">
+                                    <div class="slide-overlay"></div>
+                                </div>
+                                <div class="slide-content-overlay">
+                                    <div class="category-badge health" data-translate="wellness">Wellness</div>
+                                    <h3 class="slide-main-title" data-translate="sachetTitle">Scented Sachet Making</h3>
+                                    <p class="slide-subtitle" data-translate="sachetSubtitle">OTH Wellness Garden, L5</p>
+                                    <p class="slide-description" data-translate="sachetDescription">Enjoy a mindful garden walk and craft scented sachets with dried flowers and herbs. Perfect for relaxation, easing fatigue, and better sleep — self-care through nature's gentle gifts.</p>
+                                    <div class="slide-action">
+                                        <button class="read-more-btn" data-translate="readMoreButton" onclick="openEventModal(this.closest('.enhanced-news-slide').dataset.eventId)">Read More</button>
+                                        <div class="slide-meta">
+                                            <span class="author" data-translate="byOTH">By Our Tampines Hub</span>
+                                            <span class="read-time" data-translate="sachetDate">23 May, 8.30-9.30am</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slideshow Navigation Dots -->
+                    <div class="slideshow-navigation">
+                        <div class="nav-dots">
+                            <span class="nav-dot active" data-slide="0"></span>
+                            <span class="nav-dot" data-slide="1"></span>
+                            <span class="nav-dot" data-slide="2"></span>
+                            <span class="nav-dot" data-slide="3"></span>
+                            <span class="nav-dot" data-slide="4"></span>
+                            <span class="nav-dot" data-slide="5"></span>
+                            <span class="nav-dot" data-slide="6"></span>
+                            <span class="nav-dot" data-slide="7"></span>
+                            <span class="nav-dot" data-slide="8"></span>
+                            <span class="nav-dot" data-slide="9"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Things to do at Tampines Hub -->
+            <div class="things-to-do-section">
+                <h2 class="section-title" data-translate="thingsToDoTitle">Things to do at Tampines Hub</h2>
+                <div class="things-grid">
+                    <div class="thing-card thing-food" onclick="openDirectory('food')">
+                        <span class="thing-icon">🍜</span>
+                        <span class="thing-label" data-translate="cardFood">Food &amp; Hawker</span>
+                    </div>
+                    <div class="thing-card thing-healthcare" onclick="openDirectory('healthcare')">
+                        <span class="thing-icon">🏥</span>
+                        <span class="thing-label" data-translate="cardHealthcare">Healthcare</span>
+                    </div>
+                    <div class="thing-card thing-library" onclick="openDirectory('library')">
+                        <span class="thing-icon">📚</span>
+                        <span class="thing-label" data-translate="cardLibrary">Regional Library</span>
+                    </div>
+                    <div class="thing-card thing-swim" onclick="openDirectory('swimming')">
+                        <span class="thing-icon">🏊</span>
+                        <span class="thing-label" data-translate="cardSwim">Swimming Complex</span>
+                    </div>
+                    <div class="thing-card thing-gym" onclick="openDirectory('gym')">
+                        <span class="thing-icon">💪</span>
+                        <span class="thing-label" data-translate="cardGym">Fitness Gym</span>
+                    </div>
+                    <div class="thing-card thing-garden" onclick="openDirectory('plaza')">
+                        <span class="thing-icon">🌳</span>
+                        <span class="thing-label" data-translate="cardPlaza">Festive Plaza</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Navigation -->
+            <nav class="bottom-nav">
+                <button class="nav-btn active" onclick="showPage('home-page')">
+                    <span class="nav-icon">
+                        <img src="images/home-svgrepo-com (1).svg" alt="Home Logo" class="home-img" style="width: 30px; height: 30px;">
+                    </span>
+                    <span class="nav-label" data-translate="navHome">Home</span>
+                </button>
+
+                <button class="nav-btn" onclick="showPage('calendar-page')">
+                    <span class="nav-icon">
+                        <img src="images/calendar-lines-svgrepo-com.svg" alt="Calendar Logo" class="calendar-img" style="width: 30px; height: 30px;">
+                    </span>
+                    <span class="nav-label" style="color: #8B4513;" data-translate="navCalendar">Calendar</span>
+                </button>
+
+                <button class="nav-btn" onclick="showPage('camera-page')">
+                    <span class="nav-icon">
+                        <img src="images/camera.svg" alt="Camera Logo" class="camera-img" style="width: 30px; height: 30px;">
+                    </span>
+                    <span class="nav-label" style="color: #8B4513;" data-translate="navCamera">Camera</span>
+                </button>
+
+                <button class="nav-btn" onclick="showPage('companion-page')">
+                    <span class="nav-icon">
+                        <img src="images/avatar.svg" alt="Companion Logo" class="companion-img" style="width: 30px; height: 30px;">
+                    </span>
+                    <span class="nav-label" style="color: #8B4513;" data-translate="navCompanion">Buddy</span>
+                </button>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Calendar Page -->
+    <div id="calendar-page" class="page">
+        <div class="container">
+            <h1 class="calendar-title" data-translate="calendarTitle">Calendar</h1>
+            
+            <div class="calendar-header">
+                <button id="prevMonthBtn" class="month-nav-btn">&lt;</button>
+                <span id="monthYearLabel" class="month-year">May 2026</span>
+                <button id="nextMonthBtn" class="month-nav-btn">&gt;</button>
+            </div>
+
+            <div class="calendar-grid" id="calendarGrid">
+                <div class="calendar-day-header" data-translate="calendarSun">Sun</div>
+                <div class="calendar-day-header" data-translate="calendarMon">Mon</div>
+                <div class="calendar-day-header" data-translate="calendarTue">Tue</div>
+                <div class="calendar-day-header" data-translate="calendarWed">Wed</div>
+                <div class="calendar-day-header" data-translate="calendarThu">Thu</div>
+                <div class="calendar-day-header" data-translate="calendarFri">Fri</div>
+                <div class="calendar-day-header" data-translate="calendarSat">Sat</div>
+                <!-- Calendar days populated by JavaScript -->
+            </div>
+
+            <!-- Events for the selected day -->
+            <div id="dayEventsPanel" class="day-events-panel" style="display: none;">
+                <h3 id="dayEventsTitle" class="day-events-title"></h3>
+                <div id="dayEventsList" class="day-events-list"></div>
+            </div>
+            
+            <nav class="bottom-nav">
+                <button class="nav-btn active" onclick="showPage('home-page')">
+                    <span class="nav-icon">
+                        <img src="images/home-svgrepo-com (1).svg" alt="Home Logo" class="home-img"
+                            style="width: 30px; height: 30px;">
+                    </span>
+                    <span class="nav-label" data-translate="navHome">Home</span>
+                </button>
+
+                <button class="nav-btn" onclick="showPage('calendar-page')">
+                    <span class="nav-icon">
+                        <img src="images/calendar-lines-svgrepo-com.svg" alt="Calendar Logo" class="calendar-img"
+                            style="width: 30px; height: 30px;">
+                    </span>
+                    <span class="nav-label" style="color: #8B4513;" data-translate="navCalendar">Calendar</span>
+                </button>
+
+                <button class="nav-btn" onclick="showPage('camera-page')">
+                    <span class="nav-icon">
+                        <img src="images/camera.svg" alt="Camera Logo" class="camera-img"
+                            style="width: 30px; height: 30px;">
+                    </span>
+                    <span class="nav-label" style="color: #8B4513;" data-translate="navCamera">Camera</span>
+                </button>
+
+                <button class="nav-btn" onclick="showPage('companion-page')">
+                    <span class="nav-icon">
+                        <img src="images/avatar.svg" alt="Companion Logo" class="companion-img"
+                            style="width: 30px; height: 30px;">
+                    </span>
+                    <span class="nav-label" style="color: #8B4513;" data-translate="navCompanion">Buddy</span>
+                </button>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Buddy (Companion) Page - AI Chatbot -->
+    <div id="companion-page" class="page">
+        <div class="buddy-container">
+            <div class="buddy-header">
+                <div class="buddy-avatar-circle">🤖</div>
+                <h2 class="buddy-greeting" data-translate="buddyGreeting">Hi! I'm Buddy</h2>
+                <p class="buddy-tagline" data-translate="buddyTagline">How can I help you today?</p>
+            </div>
+
+            <div class="buddy-messages" id="buddyMessages">
+                <div class="buddy-msg buddy-msg-assistant" data-translate="buddyIntroMessage">
+                    Hello! I'm Buddy 🤗 You can ask me anything about Tampines Hub — events, clinics, food, library, swimming, or just chat with me. Tap the big mic button if you'd like to speak instead of typing.
+                </div>
+            </div>
+
+            <form class="buddy-input-area" onsubmit="sendBuddyForm(event)">
+                <input type="text" class="buddy-text-input" id="buddyTextInput" data-translate-placeholder="buddyInputPlaceholder" placeholder="Type your question..." autocomplete="off">
+                <button type="submit" class="buddy-send-btn" aria-label="Send">➤</button>
+                <button type="button" class="buddy-mic-btn" id="buddyMicBtn" onclick="toggleBuddyVoice()" aria-label="Voice input">
+                    <span class="buddy-mic-icon">🎤</span>
+                </button>
+            </form>
+            
+            <nav class="bottom-nav">
+                <button class="nav-btn active" onclick="showPage('home-page')">
+                    <span class="nav-icon">
+                        <img src="images/home-svgrepo-com (1).svg" alt="Home Logo" class="home-img"
+                            style="width: 30px; height: 30px;">
+                    </span>
+                    <span class="nav-label" data-translate="navHome">Home</span>
+                </button>
+
+                <button class="nav-btn" onclick="showPage('calendar-page')">
+                    <span class="nav-icon">
+                        <img src="images/calendar-lines-svgrepo-com.svg" alt="Calendar Logo" class="calendar-img"
+                            style="width: 30px; height: 30px;">
+                    </span>
+                    <span class="nav-label" style="color: #8B4513;" data-translate="navCalendar">Calendar</span>
+                </button>
+
+                <button class="nav-btn" onclick="showPage('camera-page')">
+                    <span class="nav-icon">
+                        <img src="images/camera.svg" alt="Camera Logo" class="camera-img"
+                            style="width: 30px; height: 30px;">
+                    </span>
+                    <span class="nav-label" style="color: #8B4513;" data-translate="navCamera">Camera</span>
+                </button>
+
+                <button class="nav-btn" onclick="showPage('companion-page')">
+                    <span class="nav-icon">
+                        <img src="images/avatar.svg" alt="Companion Logo" class="companion-img"
+                            style="width: 30px; height: 30px;">
+                    </span>
+                    <span class="nav-label" style="color: #8B4513;" data-translate="navCompanion">Buddy</span>
+                </button>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Camera Page (placeholder) -->
+    <div id="camera-page" class="page">
+        <div class="container">
+            <h1 class="camera-title" data-translate="cameraTitle">Camera</h1>
+            <p class="camera-subtitle" data-translate="cameraSubtitle">Capture memories at Tampines Hub</p>
+
+            <nav class="bottom-nav">
+                <button class="nav-btn" onclick="showPage('home-page')">
+                    <span class="nav-icon">
+                        <img src="images/home-svgrepo-com (1).svg" alt="Home Logo" class="home-img"
+                            style="width: 30px; height: 30px;">
+                    </span>
+                    <span class="nav-label" data-translate="navHome">Home</span>
+                </button>
+
+                <button class="nav-btn" onclick="showPage('calendar-page')">
+                    <span class="nav-icon">
+                        <img src="images/calendar-lines-svgrepo-com.svg" alt="Calendar Logo" class="calendar-img"
+                            style="width: 30px; height: 30px;">
+                    </span>
+                    <span class="nav-label" style="color: #8B4513;" data-translate="navCalendar">Calendar</span>
+                </button>
+
+                <button class="nav-btn active" onclick="showPage('camera-page')">
+                    <span class="nav-icon">
+                        <img src="images/camera.svg" alt="Camera Logo" class="camera-img"
+                            style="width: 30px; height: 30px;">
+                    </span>
+                    <span class="nav-label" style="color: #8B4513;" data-translate="navCamera">Camera</span>
+                </button>
+
+                <button class="nav-btn" onclick="showPage('companion-page')">
+                    <span class="nav-icon">
+                        <img src="images/avatar.svg" alt="Companion Logo" class="companion-img"
+                            style="width: 30px; height: 30px;">
+                    </span>
+                    <span class="nav-label" style="color: #8B4513;" data-translate="navCompanion">Buddy</span>
+                </button>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Directory Page (list of places in a category) -->
+    <div id="directory-page" class="page">
+        <div class="directory-container">
+            <div class="directory-header">
+                <button class="directory-back-btn" onclick="showPage('home-page')" aria-label="Back">←</button>
+                <h1 id="directoryTitle" class="directory-title">Healthcare</h1>
+            </div>
+            <p id="directorySubtitle" class="directory-subtitle">Clinics at Our Tampines Hub</p>
+
+            <div class="directory-sort">
+                <button class="sort-chip active" data-sort="rating" onclick="setDirectorySort('rating')"><span data-translate="sortTopRated">⭐ Top rated</span></button>
+                <button class="sort-chip" data-sort="reviews" onclick="setDirectorySort('reviews')"><span data-translate="sortMostReviewed">💬 Most reviewed</span></button>
+            </div>
+
+            <div id="directoryList" class="directory-list"></div>
+
+            <nav class="bottom-nav">
+                <button class="nav-btn active" onclick="showPage('home-page')">
+                    <span class="nav-icon">
+                        <img src="images/home-svgrepo-com (1).svg" alt="Home Logo" class="home-img" style="width: 30px; height: 30px;">
+                    </span>
+                    <span class="nav-label" data-translate="navHome">Home</span>
+                </button>
+                <button class="nav-btn" onclick="showPage('calendar-page')">
+                    <span class="nav-icon">
+                        <img src="images/calendar-lines-svgrepo-com.svg" alt="Calendar Logo" class="calendar-img" style="width: 30px; height: 30px;">
+                    </span>
+                    <span class="nav-label" style="color: #8B4513;" data-translate="navCalendar">Calendar</span>
+                </button>
+                <button class="nav-btn" onclick="showPage('camera-page')">
+                    <span class="nav-icon">
+                        <img src="images/camera.svg" alt="Camera Logo" class="camera-img" style="width: 30px; height: 30px;">
+                    </span>
+                    <span class="nav-label" style="color: #8B4513;" data-translate="navCamera">Camera</span>
+                </button>
+                <button class="nav-btn" onclick="showPage('companion-page')">
+                    <span class="nav-icon">
+                        <img src="images/avatar.svg" alt="Companion Logo" class="companion-img" style="width: 30px; height: 30px;">
+                    </span>
+                    <span class="nav-label" style="color: #8B4513;" data-translate="navCompanion">Buddy</span>
+                </button>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Place Detail Page (info + reviews) -->
+    <div id="place-page" class="page">
+        <div class="place-container">
+            <div class="place-header">
+                <button class="directory-back-btn" onclick="backFromPlace()" aria-label="Back">←</button>
+                <h1 id="placeName" class="place-title">Place Name</h1>
+            </div>
+
+            <img id="placeHeroImage" class="place-hero-image" src="" alt="" style="display: none;">
+
+            <div class="place-hero">
+                <div id="placeIconBig" class="place-icon-big">🏥</div>
+                <div class="place-summary">
+                    <div class="place-rating-row">
+                        <span id="placeStars" class="place-stars">★★★★★</span>
+                        <span id="placeRatingNum" class="place-rating-num">0.0</span>
+                        <span id="placeReviewsCount" class="place-reviews-count">(0 reviews)</span>
+                    </div>
+                    <p id="placeCategoryLine" class="place-category-line">Medical clinic in Singapore</p>
+                </div>
+            </div>
+
+            <div class="place-meta">
+                <div class="meta-row"><span class="meta-icon">📍</span><span id="placeAddress"></span></div>
+                <div class="meta-row"><span class="meta-icon">📞</span><span id="placePhone"></span></div>
+                <div class="meta-row"><span class="meta-icon">⏰</span><span id="placeHours"></span></div>
+            </div>
+
+            <div class="place-actions">
+                <button class="place-action-btn" onclick="callPlace()"><span data-translate="actionCall">📞 Call</span></button>
+                <button class="place-action-btn" onclick="directionsPlace()"><span data-translate="actionDirections">🧭 Directions</span></button>
+            </div>
+
+            <div class="reviews-section">
+                <div class="reviews-section-header">
+                    <h3 class="reviews-section-title" data-translate="reviewsTitle">Reviews</h3>
+                    <button class="write-review-btn" onclick="openReviewForm()"><span data-translate="writeReview">✍️ Write a review</span></button>
+                </div>
+
+                <div id="reviewForm" class="review-form" style="display: none;">
+                    <p class="review-form-label" data-translate="yourRating">Your rating</p>
+                    <div class="star-input" id="starInput">
+                        <span class="star-pick" data-value="1">☆</span>
+                        <span class="star-pick" data-value="2">☆</span>
+                        <span class="star-pick" data-value="3">☆</span>
+                        <span class="star-pick" data-value="4">☆</span>
+                        <span class="star-pick" data-value="5">☆</span>
+                    </div>
+                    <textarea id="reviewText" class="review-textarea" data-translate-placeholder="reviewPlaceholder" placeholder="Share your experience..." rows="3"></textarea>
+                    <div class="review-form-actions">
+                        <button class="review-cancel-btn" onclick="closeReviewForm()" data-translate="cancelBtn">Cancel</button>
+                        <button class="review-submit-btn" onclick="submitReview()" data-translate="postReviewBtn">Post review</button>
+                    </div>
+                </div>
+
+                <div id="reviewsList" class="reviews-list"></div>
+            </div>
+
+            <nav class="bottom-nav">
+                <button class="nav-btn active" onclick="showPage('home-page')">
+                    <span class="nav-icon">
+                        <img src="images/home-svgrepo-com (1).svg" alt="Home Logo" class="home-img" style="width: 30px; height: 30px;">
+                    </span>
+                    <span class="nav-label" data-translate="navHome">Home</span>
+                </button>
+                <button class="nav-btn" onclick="showPage('calendar-page')">
+                    <span class="nav-icon">
+                        <img src="images/calendar-lines-svgrepo-com.svg" alt="Calendar Logo" class="calendar-img" style="width: 30px; height: 30px;">
+                    </span>
+                    <span class="nav-label" style="color: #8B4513;" data-translate="navCalendar">Calendar</span>
+                </button>
+                <button class="nav-btn" onclick="showPage('camera-page')">
+                    <span class="nav-icon">
+                        <img src="images/camera.svg" alt="Camera Logo" class="camera-img" style="width: 30px; height: 30px;">
+                    </span>
+                    <span class="nav-label" style="color: #8B4513;" data-translate="navCamera">Camera</span>
+                </button>
+                <button class="nav-btn" onclick="showPage('companion-page')">
+                    <span class="nav-icon">
+                        <img src="images/avatar.svg" alt="Companion Logo" class="companion-img" style="width: 30px; height: 30px;">
+                    </span>
+                    <span class="nav-label" style="color: #8B4513;" data-translate="navCompanion">Buddy</span>
+                </button>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Event Detail Modal -->
+    <div id="eventModal" class="event-modal" style="display: none;">
+        <div class="event-modal-overlay" onclick="closeEventModal()"></div>
+        <div class="event-modal-content">
+            <div class="event-modal-top-bar">
+                <button id="eventModalAddBtn" class="event-modal-add-btn" onclick="addCurrentEventToCalendar()">
+                    <span class="add-icon">＋</span> <span class="add-label" data-translate="addToCalendar">Add to Calendar</span>
+                </button>
+                <button class="event-modal-close-btn" onclick="closeEventModal()" aria-label="Close">×</button>
+            </div>
+            <div class="event-modal-scroll">
+                <img id="eventModalImage" class="event-modal-image" src="" alt="">
+                <div class="event-modal-body">
+                    <h2 id="eventModalTitle" class="event-modal-title"></h2>
+                    <div class="event-modal-meta-grid">
+                        <div class="meta-row"><span class="meta-icon">📅</span><span id="eventModalDate"></span></div>
+                        <div class="meta-row"><span class="meta-icon">⏰</span><span id="eventModalTime"></span></div>
+                        <div class="meta-row"><span class="meta-icon">📍</span><span id="eventModalLocation"></span></div>
+                    </div>
+                    <p id="eventModalDescription" class="event-modal-description"></p>
+                    <p id="eventModalRegister" class="event-modal-register"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendar Event Action Modal (for tapping events in calendar) -->
+    <div id="calendarEventModal" class="event-modal" style="display: none;">
+        <div class="event-modal-overlay" onclick="closeCalendarEventModal()"></div>
+        <div class="event-modal-content event-modal-content-small">
+            <div class="event-modal-top-bar">
+                <h3 id="calendarEventModalTitle" class="calendar-event-title"></h3>
+                <button class="event-modal-close-btn" onclick="closeCalendarEventModal()" aria-label="Close">×</button>
+            </div>
+            <div class="calendar-event-actions">
+                <button class="calendar-event-action important-btn" onclick="toggleCalendarEventImportant()">
+                    <span class="action-icon">⭐</span> <span id="importantBtnLabel" data-translate="markAsImportant">Mark as Important</span>
+                </button>
+                <button class="calendar-event-action remove-btn" onclick="removeCalendarEvent()">
+                    <span class="action-icon">🗑️</span> <span data-translate="removeFromCalendar">Remove from Calendar</span>
+                </button>
+                <button class="calendar-event-action view-btn" onclick="viewCalendarEventDetails()">
+                    <span class="action-icon">👁️</span> <span data-translate="viewFullDetails">View Full Details</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+

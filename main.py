@@ -23,7 +23,7 @@ from typing import Literal
 from dotenv import load_dotenv
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from openai import OpenAI
 from pydantic import BaseModel, Field
 
@@ -151,10 +151,54 @@ class ChatMessage(BaseModel):
 
 class ChatRequest(BaseModel):
     messages: list[ChatMessage] = Field(..., min_length=1)
+    # New UI lets users pick EN / ZH / MS on the welcome page. The directive
+    # is appended server-side so the prompt stays out of the client.
+    language: Literal["en", "zh", "ms"] = "en"
+
+
+class ServiceCard(BaseModel):
+    service_id: str
+    service_name: str
+    agency: str
+    location_type: str
+    oth_location: str
+    operating_hours: dict
+    required_documents: list[dict]
+    walk_in_accepted: bool
+    appointment_required: bool
+    typical_processing_time: str
+    phone: str | None = None
+    website: str | None = None
 
 
 class ChatResponse(BaseModel):
     reply: str
+    services: list[ServiceCard] = []
+
+
+LANGUAGE_DIRECTIVES: dict[str, str] = {
+    "en": (
+        "LANGUAGE: The user has selected English. Reply in English. "
+        "Light Singlish is welcome if the user uses it.\n\n"
+    ),
+    "zh": (
+        "LANGUAGE: The user has selected Chinese (中文). You MUST reply ONLY in "
+        "Simplified Chinese (简体中文), regardless of which language the user "
+        "types in. Use natural, warm Chinese suitable for elderly residents. "
+        "Keep proper nouns (Our Tampines Hub, ServiceSG, ComCare, SingPass, "
+        "MSF, HDB, CPF, IRAS, scheme names) in their original English form "
+        "if they have no common Chinese name; everything else must be in "
+        "Chinese.\n\n"
+    ),
+    "ms": (
+        "LANGUAGE: The user has selected Bahasa Melayu. You MUST reply ONLY "
+        "in Bahasa Melayu, regardless of which language the user types in. "
+        "Use warm, simple Malay suitable for elderly residents. Keep proper "
+        "nouns (Our Tampines Hub, ServiceSG, ComCare, SingPass, MSF, HDB, "
+        "CPF, IRAS, scheme names) in their original English form; everything "
+        "else must be in Bahasa Melayu.\n\n"
+    ),
+}
 
 
 class TranscriptionResponse(BaseModel):
@@ -224,6 +268,7 @@ def build_system_prompt(
     retrieved: list[RetrievedService],
     confidence_low: bool,
     fallback: dict,
+    language: str = "en",
 ) -> str:
     food_json = json.dumps(food, ensure_ascii=False, indent=2)
     counters_block = format_general_counters(counters)
@@ -242,7 +287,9 @@ def build_system_prompt(
     fallback_name = fallback.get("name", "OTH Information Counter")
     fallback_loc = fallback.get("location", "Level 1, Main Atrium")
 
-    return f"""You are **OTH Buddy**, the Smart Concierge for Our Tampines Hub (OTH) in Singapore.
+    language_directive = LANGUAGE_DIRECTIVES.get(language, LANGUAGE_DIRECTIVES["en"])
+
+    return language_directive + f"""You are **OTH Buddy**, the Smart Concierge for Our Tampines Hub (OTH) in Singapore.
 
 # Your persona
 - Warm, empathetic, patient, and encouraging — like a kind neighbour who knows the building inside out.
@@ -320,26 +367,27 @@ Point them to the **ServiceSG counter at Level 1, #01-21** with a one-line note 
 Handle the government step first, then suggest 1-2 F&B options nearby on the same level if possible.
 
 # Hard rules — do not break
-1. **For places listed in blocks 1-4, never invent details.** Names, locations, hours, documents, eligibility — use only what's in the blocks. If the blocks don't have the detail, either web_search-and-quote, or say you don't have that info and suggest the right counter.
-2. **For schemes not in the blocks**, use web_search and quote .gov.sg sources. Don't make up numbers, dates, or rules.
-3. **Never give medical, legal, or financial advice** beyond pointing to the right counter.
-4. **Never promise outcomes** ("you will definitely get the loan"). Use "they can assess your case".
-5. If the user is in immediate distress (mentions self-harm, abuse, no food tonight, nowhere to sleep), gently share the **24-hour ComCare hotline 1800-222-0000** alongside the route you suggest.
+1. For places listed in blocks 1-4, never invent details. Names, locations, hours, documents, eligibility — use only what's in the blocks. If the blocks don't have the detail, either web_search-and-quote, or say you don't have that info and suggest the right counter.
+2. For schemes not in the blocks, use web_search and quote .gov.sg sources. Don't make up numbers, dates, or rules.
+3. Never give medical, legal, or financial advice beyond pointing to the right counter.
+4. Never promise outcomes ("you will definitely get the loan"). Use "they can assess your case".
+5. If the user is in immediate distress (mentions self-harm, abuse, no food tonight, nowhere to sleep), gently share the 24-hour ComCare hotline 1800-222-0000 alongside the route you suggest.
 6. Keep replies concise and actionable. Always include exact level + unit number when naming a place.
 
+# OUTPUT FORMAT (STRICT — overrides any earlier examples)
+- Reply in PLAIN TEXT only. Do NOT use any markdown: no #, ##, ### headers; no ** for bold; no * or - for bullets; no backticks. The frontend renders the visual roadmap from structured data, so your text only needs to be a short empathetic intro plus a numbered roadmap.
+- Structure every actionable answer like this:
+    Line 1-2: warm acknowledgement of the user's situation (1-2 sentences, plain prose).
+    Then a blank line.
+    Then numbered steps "1. ...", "2. ...", "3. ..." — each step is ONE service from block 3 (specific schemes) or block 2 (counters). One sentence per step is best, two max.
+    Then a blank line.
+    Closing line: one sentence of encouragement or a "bring NRIC" reminder.
+- Each numbered step in your text MUST correspond to a service the user can take action on at OTH. Do not number lines that aren't services.
+
+# OUT-OF-SCOPE RULE (STRICT)
+If part of the user's question has no matching service in block 3 above and is also not handled by the ServiceSG counter (block 2) — for example, buying a hospital bed, finding a wheelchair, choosing a babysitter, generic shopping, "where to find X product" — do NOT suggest external alternatives (Carousell, Shopee, Amazon, "google it", "check online", third-party shops). Acknowledge briefly that OTH doesn't offer that, and immediately pivot to the OTH services that DO help with the rest of the user's question. Never invent a step.
+
 Now respond to the user's message."""
-
-
-@app.get("/")
-def home():
-    # Disable browser caching of index.html so every reload picks up the
-    # latest UI without users needing to hard-refresh. The page itself is
-    # tiny; the cost of fetching it fresh each time is negligible.
-    response = FileResponse(Path(__file__).parent / "index.html")
-    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-    response.headers["Pragma"] = "no-cache"
-    response.headers["Expires"] = "0"
-    return response
 
 
 @app.get("/health")
@@ -371,6 +419,7 @@ def chat(req: ChatRequest):
             "Fallback",
             {"name": "OTH Information Counter", "location": "Level 1, Main Atrium"},
         ),
+        language=req.language,
     )
 
     # Use the OpenAI Responses API rather than Chat Completions so we get the
@@ -393,7 +442,24 @@ def chat(req: ChatRequest):
         raise HTTPException(status_code=502, detail=f"OpenAI request failed: {e}")
 
     reply = (getattr(response, "output_text", "") or "").strip()
-    return ChatResponse(reply=reply)
+    cards = [
+        ServiceCard(
+            service_id=r.service.service_id,
+            service_name=r.service.service_name,
+            agency=r.service.agency,
+            location_type=r.service.location_type,
+            oth_location=r.service.oth_location,
+            operating_hours=r.service.operating_hours,
+            required_documents=[d.model_dump() for d in r.service.required_documents],
+            walk_in_accepted=r.service.walk_in_accepted,
+            appointment_required=r.service.appointment_required,
+            typical_processing_time=r.service.typical_processing_time,
+            phone=r.service.contact.phone,
+            website=r.service.contact.website,
+        )
+        for r in retrieval.services
+    ]
+    return ChatResponse(reply=reply, services=cards)
 
 
 @app.post("/api/transcribe", response_model=TranscriptionResponse)
@@ -427,3 +493,11 @@ async def transcribe(audio: UploadFile = File(...)):
     rough = (result.text or "").strip()
     corrected = correct_singlish_transcript(rough)
     return TranscriptionResponse(text=corrected)
+
+
+# Mount the My Kopi Kaki multi-page UI at /. Declared AFTER the /api/* and
+# /health routes so those still resolve — FastAPI matches explicit routes
+# before mounts. html=True serves index.html for /, and any other asset
+# (styles.css, script.js, images/, Videos/) resolves to a file in the dir.
+_UI_DIR = Path(__file__).parent / "my-kopi-kaki-app"
+app.mount("/", StaticFiles(directory=_UI_DIR, html=True), name="ui")
