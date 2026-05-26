@@ -17,7 +17,8 @@ pytest-cov==5.0.0
 # Dev quality-of-life
 ruff==0.7.2                     # linter + formatter
 
-# OTH Buddy chatbot app (main.py, index.html)
-fastapi                          # web framework for /api/chat + /api/transcribe
+# OTH Buddy chatbot app (main.py + my-kopi-kaki-app/ static UI)
+fastapi                          # /api/chat + /api/transcribe + /api/tts + static mount
 uvicorn[standard]                # ASGI server
 python-multipart                 # parse audio uploads on /api/transcribe
+httpx                            # ElevenLabs TTS HTTP calls in /api/tts
