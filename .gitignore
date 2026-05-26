@@ -19,3 +19,6 @@ venv/
 # OneDrive sync artifacts (in case the project stays under OneDrive)
 *.tmp
 ~$*
+
+# Claude Code per-machine settings — should never be committed
+.claude/settings.local.json

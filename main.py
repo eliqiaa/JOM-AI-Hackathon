@@ -20,9 +20,11 @@ import os
 from pathlib import Path
 from typing import Literal
 
+import httpx
 from dotenv import load_dotenv
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response
 from fastapi.staticfiles import StaticFiles
 from openai import OpenAI
 from pydantic import BaseModel, Field
@@ -44,6 +46,25 @@ OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 # gpt-4o-transcribe is OpenAI's newer transcription model, noticeably better
 # than whisper-1 on accented English. Same per-minute price. Override via env.
 WHISPER_MODEL = os.getenv("WHISPER_MODEL", "gpt-4o-transcribe")
+
+# ElevenLabs TTS — high-quality voice reply, free tier ~10k chars/month.
+# If ELEVENLABS_API_KEY is unset, /api/tts returns 503 and the frontend
+# falls back to the browser's speechSynthesis voice automatically.
+ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY")
+# Default voice = "Sarah" — one of the few "default" voices still usable on
+# the free tier. ElevenLabs's older popular voices (Rachel, Aria) are now
+# "library voices" requiring a paid plan when called via API. Known
+# free-tier-safe IDs: Sarah=EXAVITQu4vr4xnSDxMaL, Laura=FGY2WhTYpPnrIDTdsKH5,
+# George=JBFqnCBsd6RMkjVDRZzb. To use a custom voice, set ELEVENLABS_VOICE_ID
+# in .env to its ID from https://elevenlabs.io/app/voice-library.
+ELEVENLABS_VOICE_ID = os.getenv("ELEVENLABS_VOICE_ID", "EXAVITQu4vr4xnSDxMaL")
+# Model tiers: eleven_multilingual_v2 (best quality, slower) /
+# eleven_turbo_v2_5 (fast, lower latency) / eleven_flash_v2_5 (cheapest).
+ELEVENLABS_MODEL = os.getenv("ELEVENLABS_MODEL", "eleven_multilingual_v2")
+ELEVENLABS_TTS_URL = (
+    f"https://api.elevenlabs.io/v1/text-to-speech/{ELEVENLABS_VOICE_ID}"
+)
+
 DATABASE_PATH = Path(__file__).parent / "database.json"
 
 # Whisper / gpt-4o-transcribe treats the `prompt` parameter as if it were the
@@ -203,6 +224,10 @@ LANGUAGE_DIRECTIVES: dict[str, str] = {
 
 class TranscriptionResponse(BaseModel):
     text: str
+
+
+class TTSRequest(BaseModel):
+    text: str = Field(..., min_length=1, max_length=8000)
 
 
 def load_database() -> dict:
@@ -495,7 +520,50 @@ async def transcribe(audio: UploadFile = File(...)):
     return TranscriptionResponse(text=corrected)
 
 
-# Mount the My Kopi Kaki multi-page UI at /. Declared AFTER the /api/* and
+@app.post("/api/tts")
+def tts(req: TTSRequest) -> Response:
+    """Generate a voice reply via ElevenLabs.
+
+    Returns audio/mpeg (MP3) bytes the frontend can play directly. Returns
+    503 (not 502) when the key is missing so the frontend can distinguish
+    "not configured" from "ElevenLabs errored" and pick the speechSynthesis
+    fallback silently in the first case.
+    """
+    if not ELEVENLABS_API_KEY:
+        raise HTTPException(status_code=503, detail="ELEVENLABS_API_KEY not set in .env")
+
+    body = {
+        "text": req.text,
+        "model_id": ELEVENLABS_MODEL,
+        # Defaults from ElevenLabs's own docs — stable enough for an
+        # information-bot use case without sounding monotonous.
+        "voice_settings": {"stability": 0.5, "similarity_boost": 0.75},
+    }
+
+    try:
+        resp = httpx.post(
+            ELEVENLABS_TTS_URL,
+            headers={
+                "xi-api-key": ELEVENLABS_API_KEY,
+                "Accept": "audio/mpeg",
+                "Content-Type": "application/json",
+            },
+            json=body,
+            timeout=30.0,
+        )
+    except httpx.RequestError as e:
+        raise HTTPException(status_code=502, detail=f"ElevenLabs request failed: {e}")
+
+    if resp.status_code != 200:
+        raise HTTPException(
+            status_code=502,
+            detail=f"ElevenLabs error {resp.status_code}: {resp.text[:500]}",
+        )
+
+    return Response(content=resp.content, media_type="audio/mpeg")
+
+
+# Mount the OTH Buddy multi-page UI at /. Declared AFTER the /api/* and
 # /health routes so those still resolve — FastAPI matches explicit routes
 # before mounts. html=True serves index.html for /, and any other asset
 # (styles.css, script.js, images/, Videos/) resolves to a file in the dir.
